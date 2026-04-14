@@ -703,12 +703,44 @@ def _fetch_all_articles_with_session(
     elif use_scraper and not authenticated:
         logger.info("Skipping section scraper (not authenticated).")
 
-    # Age filter
+    # Age filter — with fallback for system clock / feed date mismatch.
+    # When the system clock is ahead of the feed (e.g. a dev environment
+    # with a future system date), all articles appear "too old" and the
+    # pipeline produces nothing.  In that case we fall back to
+    # article-relative dating: keep articles within max_age hours of the
+    # newest article in the feed rather than within max_age hours of now.
     before_age = len(articles)
-    articles   = [a for a in articles if a.age_hours() <= max_age]
-    dropped    = before_age - len(articles)
-    if dropped:
-        logger.info("Age filter dropped %d articles (> %sh old).", dropped, max_age)
+
+    def _pub_utc(a: Article) -> datetime:
+        t = a.publish_time
+        return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+    filtered = [a for a in articles if a.age_hours() <= max_age]
+
+    if not filtered and articles:
+        now          = datetime.now(timezone.utc)
+        newest_time  = max(_pub_utc(a) for a in articles)
+        clock_lead_h = (now - newest_time).total_seconds() / 3600
+        filtered     = [
+            a for a in articles
+            if (newest_time - _pub_utc(a)).total_seconds() / 3600 <= max_age
+        ]
+        logger.warning(
+            "Age filter: system clock (%s UTC) is %.0fh ahead of the newest "
+            "feed article (%s UTC). Switching to article-relative cutoff — "
+            "%d of %d articles kept.",
+            now.strftime("%Y-%m-%d %H:%M"),
+            clock_lead_h,
+            newest_time.strftime("%Y-%m-%d %H:%M"),
+            len(filtered),
+            before_age,
+        )
+    else:
+        dropped = before_age - len(filtered)
+        if dropped:
+            logger.info("Age filter dropped %d articles (> %sh old).", dropped, max_age)
+
+    articles = filtered
 
     # URL dedup (exact)
     seen_urls: set[str] = set()

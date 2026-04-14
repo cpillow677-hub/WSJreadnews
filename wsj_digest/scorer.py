@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import logging
 import re
+from datetime import datetime, timezone
 from typing import Optional
 
 from .models import Article
@@ -102,9 +103,49 @@ def _compute_importance(article: Article, category_defs: dict) -> float:
 # Recency score                                                         #
 # ------------------------------------------------------------------ #
 
-def _compute_recency(article: Article, max_age_hours: float = 48.0) -> float:
+def _compute_reference_time(articles: list[Article]) -> datetime:
+    """
+    Return the reference datetime for recency calculations.
+
+    Normally returns datetime.now(UTC).  When the system clock is more than
+    24 h ahead of the newest feed article (e.g. a dev environment with a
+    future system date), returns the newest article's publish_time so that
+    recency scores reflect article-relative freshness rather than being 0
+    for every article.
+    """
+    now = datetime.now(timezone.utc)
+    if not articles:
+        return now
+
+    def _pub_utc(a: Article) -> datetime:
+        t = a.publish_time
+        return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+    newest_pub   = max(_pub_utc(a) for a in articles)
+    clock_lead_h = (now - newest_pub).total_seconds() / 3600
+
+    if clock_lead_h > 24:
+        logger.debug(
+            "Recency scorer: system clock is %.0fh ahead of newest article "
+            "(%s UTC) — using article-relative reference time.",
+            clock_lead_h,
+            newest_pub.strftime("%Y-%m-%d %H:%M"),
+        )
+        return newest_pub
+    return now
+
+
+def _compute_recency(
+    article: Article,
+    max_age_hours: float = 48.0,
+    reference_time: Optional[datetime] = None,
+) -> float:
     """
     Piecewise-linear decay from 100 (just published) to 0 (older than max_age).
+
+    reference_time: the "now" used for age calculation (defaults to
+    datetime.now UTC).  Pass a different value to correct for system clock
+    drift relative to feed publication dates.
 
     Breakpoints:
       ≤ 2h  → 100
@@ -114,7 +155,14 @@ def _compute_recency(article: Article, max_age_hours: float = 48.0) -> float:
       ≤ 48h → 16 → 5    (−0.45/h)
       > 48h → 0
     """
-    age = article.age_hours()
+    if reference_time is None:
+        reference_time = datetime.now(timezone.utc)
+
+    pub = article.publish_time
+    if pub.tzinfo is None:
+        pub = pub.replace(tzinfo=timezone.utc)
+    age = (reference_time - pub).total_seconds() / 3600
+
     if age <= 2:
         return 100.0
     if age <= 6:
@@ -171,10 +219,13 @@ def score_articles(articles: list[Article], config: dict) -> list[Article]:
     max_age = settings.get("max_age_hours", 48.0)
     category_defs = config.get("categories", {})
 
+    # Reference time for recency: corrects for system clock ahead of feed dates
+    reference_time = _compute_reference_time(articles)
+
     for article in articles:
         try:
             article.importance_score = _compute_importance(article, category_defs)
-            article.recency_score = _compute_recency(article, max_age)
+            article.recency_score = _compute_recency(article, max_age, reference_time)
             article.market_relevance_score = _compute_market_relevance(article)
             article.total_score = _compute_total(
                 article.importance_score,
