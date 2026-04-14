@@ -9,12 +9,14 @@ Run with:
 from __future__ import annotations
 
 import logging
+import os
 import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 import yaml
 
 # Make the project root importable when running from repo root
@@ -25,6 +27,12 @@ from wsj_digest.scorer import score_articles, classify_article, _compute_recency
 from wsj_digest.selector import deduplicate_by_url, deduplicate_fuzzy, select_top_articles
 from wsj_digest.summarizer import summarize_article, summarize_all, _build_summary
 from wsj_digest.renderer import render_html, render_markdown
+from wsj_digest.fetcher import (
+    _parse_wsj_body,
+    enrich_with_full_text,
+    _fetch_all_articles_with_session,
+    PlaywrightArticleFetcher,
+)
 
 # ------------------------------------------------------------------ #
 # Fixtures & helpers                                                    #
@@ -568,7 +576,7 @@ class TestEndToEndPipeline:
         # Override publish times to be recent (patch age_hours on Article)
         from wsj_digest import fetcher, scorer, selector, summarizer, renderer
 
-        articles = fetcher.fetch_all_articles(self.config)
+        articles, _session = fetcher._fetch_all_articles_with_session(self.config)
         # Force articles to appear fresh for scoring
         for a in articles:
             a.publish_time = __import__("datetime").datetime.now(
@@ -627,3 +635,361 @@ class TestEndToEndPipeline:
         )
         assert html_path.exists()
         assert "shortfall-notice" in html_path.read_text().lower()
+
+
+# ------------------------------------------------------------------ #
+# Mock HTML shared across full-text tests                              #
+# ------------------------------------------------------------------ #
+
+MOCK_ARTICLE_HTML = """<!DOCTYPE html>
+<html><head><title>Federal Reserve Raises Rates</title></head>
+<body>
+  <article>
+    <h1>Federal Reserve Raises Interest Rates</h1>
+    <p class="paragraph--content">The Federal Reserve raised its benchmark interest rate by 25 basis points on Wednesday, citing persistent inflation above its 2 percent target. The decision was unanimous among committee members.</p>
+    <p class="paragraph--content">Fed Chair Jerome Powell said the central bank would remain data-dependent in future policy decisions and did not commit to additional hikes. Markets reacted with a broad selloff in equities while Treasury bonds found some support.</p>
+    <p class="paragraph--content">The federal funds rate now stands at its highest level in 15 years, affecting mortgage rates, corporate borrowing costs, and consumer credit markets broadly.</p>
+    <p class="paragraph--content">Analysts at Goldman Sachs and Morgan Stanley revised their year-end rate forecasts upward following the announcement, with some economists now projecting one additional hike before year-end.</p>
+  </article>
+</body></html>"""
+
+
+# ------------------------------------------------------------------ #
+# _parse_wsj_body                                                       #
+# ------------------------------------------------------------------ #
+
+class TestParseWsjBody:
+    def test_article_tag_extracts_paragraphs(self):
+        html = """<html><body><article>
+          <p class="paragraph">First paragraph with enough text to pass the filter criteria here.</p>
+          <p class="paragraph">Second paragraph discussing the implications of the rate decision.</p>
+        </article></body></html>"""
+        result = _parse_wsj_body(html)
+        assert "First paragraph" in result
+        assert "Second paragraph" in result
+
+    def test_paragraph_class_selector(self):
+        html = """<html><body>
+          <p class="paragraph--content">Meaningful paragraph with substantive content about market events today.</p>
+          <p class="paragraph--content">Another meaningful paragraph about economic data and central bank policy.</p>
+        </body></html>"""
+        result = _parse_wsj_body(html)
+        assert "Meaningful paragraph" in result
+
+    def test_fallback_long_paragraphs(self):
+        html = """<html><body>
+          <p>Short.</p>
+          <p>This is a longer paragraph with more than eighty characters of actual useful article content that should be included in the result.</p>
+        </body></html>"""
+        result = _parse_wsj_body(html)
+        assert "longer paragraph" in result
+        assert "Short" not in result  # too short, filtered
+
+    def test_strips_boilerplate(self):
+        html = """<html><body><article>
+          <p class="paragraph">Good content about interest rates and monetary policy decisions.</p>
+          <p class="paragraph">Subscribe now to read more about our coverage of financial markets.</p>
+          <p class="paragraph">All rights reserved. WSJ.com 2026.</p>
+        </article></body></html>"""
+        result = _parse_wsj_body(html)
+        assert "Good content" in result
+        assert "Subscribe now" not in result
+        assert "All rights reserved" not in result
+
+    def test_returns_string_for_bare_html(self):
+        html = "<html><head></head><body><div>No articles here.</div></body></html>"
+        result = _parse_wsj_body(html)
+        assert isinstance(result, str)
+
+
+# ------------------------------------------------------------------ #
+# Article model: full_text fields                                       #
+# ------------------------------------------------------------------ #
+
+class TestArticleFullTextFields:
+    def test_full_text_field_exists(self):
+        a = make_article()
+        assert hasattr(a, "full_text")
+        assert a.full_text == ""
+
+    def test_full_text_fetched_field_exists(self):
+        a = make_article()
+        assert hasattr(a, "full_text_fetched")
+        assert a.full_text_fetched is False
+
+    def test_full_text_not_in_to_dict(self):
+        a = make_article()
+        a.full_text = "SENTINEL_FULL_TEXT_SHOULD_NOT_APPEAR_IN_DICT"
+        d = a.to_dict()
+        assert "full_text" not in d
+        assert "SENTINEL_FULL_TEXT_SHOULD_NOT_APPEAR_IN_DICT" not in str(list(d.values()))
+
+    def test_full_text_fetched_not_in_to_dict(self):
+        a = make_article()
+        a.full_text_fetched = True
+        d = a.to_dict()
+        assert "full_text_fetched" not in d
+
+
+# ------------------------------------------------------------------ #
+# enrich_with_full_text — requests path                                 #
+# ------------------------------------------------------------------ #
+
+class TestFullTextEnrichmentRequests:
+    def setup_method(self):
+        self.config = load_config()
+        self.config.setdefault("settings", {})["full_text_rate_sec"] = 0.0
+        self.config["settings"]["use_playwright_fulltext"] = False
+
+    def _make_articles_by_category(self) -> dict[str, list[Article]]:
+        return {
+            "Market": [
+                make_article(
+                    title="Federal Reserve Raises Rates 25 Basis Points",
+                    url="https://www.wsj.com/articles/fed-rates",
+                ),
+            ]
+        }
+
+    @patch("requests.Session.get")
+    def test_enrich_populates_full_text(self, mock_get):
+        mock_resp = MagicMock()
+        mock_resp.text = MOCK_ARTICLE_HTML
+        mock_resp.raise_for_status = MagicMock()
+        mock_get.return_value = mock_resp
+
+        articles_by_cat = self._make_articles_by_category()
+        session = requests.Session()
+        result = enrich_with_full_text(articles_by_cat, session, self.config)
+
+        article = result["Market"][0]
+        assert article.full_text_fetched is True
+        assert len(article.full_text) > 0
+
+    @patch("requests.Session.get")
+    def test_enrich_graceful_on_timeout(self, mock_get):
+        mock_get.side_effect = requests.Timeout()
+
+        articles_by_cat = self._make_articles_by_category()
+        session = requests.Session()
+        result = enrich_with_full_text(articles_by_cat, session, self.config)
+
+        article = result["Market"][0]
+        assert article.full_text_fetched is True
+        assert article.fetch_error is True
+        assert article.full_text == ""
+
+    @patch("requests.Session.get")
+    def test_enrich_graceful_on_http_403(self, mock_get):
+        http_error = requests.HTTPError()
+        mock_error_resp = MagicMock()
+        mock_error_resp.status_code = 403
+        http_error.response = mock_error_resp
+        mock_get.side_effect = http_error
+
+        articles_by_cat = self._make_articles_by_category()
+        session = requests.Session()
+        result = enrich_with_full_text(articles_by_cat, session, self.config)
+
+        article = result["Market"][0]
+        assert article.full_text_fetched is True
+        assert article.fetch_error is True
+
+    @patch("requests.Session.get")
+    def test_enrich_skips_already_fetched(self, mock_get):
+        articles_by_cat = self._make_articles_by_category()
+        article = articles_by_cat["Market"][0]
+        article.full_text_fetched = True
+        article.full_text = "Previously fetched content."
+
+        session = requests.Session()
+        enrich_with_full_text(articles_by_cat, session, self.config)
+
+        mock_get.assert_not_called()
+        assert article.full_text == "Previously fetched content."
+
+
+# ------------------------------------------------------------------ #
+# PlaywrightArticleFetcher (mocked — no real browser launched)         #
+# ------------------------------------------------------------------ #
+
+class TestPlaywrightArticleFetcher:
+    def setup_method(self):
+        self.config = {"settings": {
+            "playwright_headless": True,
+            "playwright_timeout_ms": 5000,
+            "full_text_rate_sec": 0.0,
+        }}
+
+    def _make_pw_mocks(self, article_html: str = MOCK_ARTICLE_HTML):
+        """Build a fully-mocked Playwright stack without launching a real browser."""
+        mock_page = MagicMock()
+        mock_page.content.return_value = article_html
+        mock_page.goto.return_value = None
+        mock_page.wait_for_selector.return_value = None
+        mock_page.query_selector.return_value = None  # no "Continue" button during login
+
+        mock_context = MagicMock()
+        mock_context.new_page.return_value = mock_page
+
+        mock_browser = MagicMock()
+        mock_browser.new_context.return_value = mock_context
+
+        mock_pw_instance = MagicMock()
+        mock_pw_instance.chromium.launch.return_value = mock_browser
+
+        mock_sync_pw_call = MagicMock()
+        mock_sync_pw_call.start.return_value = mock_pw_instance
+
+        mock_sync_pw = MagicMock(return_value=mock_sync_pw_call)
+        return mock_sync_pw, mock_context, mock_page
+
+    @patch("wsj_digest.fetcher.PLAYWRIGHT_AVAILABLE", False)
+    def test_start_raises_when_playwright_not_installed(self):
+        fetcher = PlaywrightArticleFetcher(self.config)
+        with pytest.raises(RuntimeError, match="Playwright is not installed"):
+            fetcher.start()
+
+    @patch.dict(os.environ, {"WSJ_EMAIL": "", "WSJ_PASSWORD": ""})
+    def test_fetch_article_returns_body_text(self):
+        mock_sync_pw, mock_context, mock_page = self._make_pw_mocks(MOCK_ARTICLE_HTML)
+        with patch("wsj_digest.fetcher.PLAYWRIGHT_AVAILABLE", True), \
+             patch("wsj_digest.fetcher.sync_playwright", mock_sync_pw, create=True):
+            fetcher = PlaywrightArticleFetcher(self.config)
+            fetcher.start()
+            text = fetcher.fetch_article("https://www.wsj.com/articles/test")
+            fetcher.stop()
+
+        assert isinstance(text, str)
+        assert len(text) > 0
+        mock_page.goto.assert_called_once()
+
+    @patch.dict(os.environ, {"WSJ_EMAIL": "", "WSJ_PASSWORD": ""})
+    def test_fetch_article_returns_empty_on_error(self):
+        mock_sync_pw, mock_context, mock_page = self._make_pw_mocks()
+        mock_page.goto.side_effect = Exception("net::ERR_CONNECTION_REFUSED")
+
+        with patch("wsj_digest.fetcher.PLAYWRIGHT_AVAILABLE", True), \
+             patch("wsj_digest.fetcher.sync_playwright", mock_sync_pw, create=True):
+            fetcher = PlaywrightArticleFetcher(self.config)
+            fetcher.start()
+            text = fetcher.fetch_article("https://www.wsj.com/articles/bad-url")
+            fetcher.stop()
+
+        assert text == ""
+
+    @patch.dict(os.environ, {"WSJ_EMAIL": "", "WSJ_PASSWORD": ""})
+    def test_login_logs_warning_when_no_credentials(self, caplog):
+        mock_sync_pw, mock_context, mock_page = self._make_pw_mocks()
+
+        with caplog.at_level(logging.WARNING, logger="wsj_digest.fetcher"):
+            with patch("wsj_digest.fetcher.PLAYWRIGHT_AVAILABLE", True), \
+                 patch("wsj_digest.fetcher.sync_playwright", mock_sync_pw, create=True):
+                fetcher = PlaywrightArticleFetcher(self.config)
+                fetcher.start()
+                fetcher.stop()
+
+        assert any(
+            "WSJ_EMAIL" in r.message or "not set" in r.message
+            for r in caplog.records
+        )
+        # _login() returns early when no credentials — new_page() should not be called
+        mock_context.new_page.assert_not_called()
+
+
+# ------------------------------------------------------------------ #
+# Summarizer — full-text path                                           #
+# ------------------------------------------------------------------ #
+
+class TestFullTextSummarizer:
+    def setup_method(self):
+        self.config = load_config()
+        self.cats = self.config["categories"]
+
+    _FULL_TEXT_BODY = (
+        "The Federal Reserve raised its benchmark interest rate by 25 basis points "
+        "on Wednesday, pushing borrowing costs to their highest level in 15 years. "
+        "Fed Chair Jerome Powell said the central bank remained committed to bringing "
+        "inflation back to its 2 percent target, noting that recent data showed "
+        "persistent price pressures across services and housing. "
+        "The committee voted unanimously in favour of the increase, which markets "
+        "had widely anticipated following last month's stronger-than-expected jobs report. "
+        "Treasury yields climbed sharply in response, with the 10-year note rising "
+        "to 4.85 percent. The S&P 500 fell 1.2 percent as investors reassessed "
+        "corporate earnings expectations for rate-sensitive sectors. "
+        "Mortgage rates are likely to move higher within days, according to analysts "
+        "at Wells Fargo and Bank of America. The 30-year fixed rate could reach "
+        "7.5 percent by year-end if the Fed delivers one additional hike. "
+        "Small businesses are already feeling the squeeze, with credit card interest "
+        "rates averaging above 22 percent. Consumer spending data due next week will "
+        "be closely watched for signs of demand slowing in response to tighter credit. "
+        "Several regional banks reported higher funding costs in their latest filings, "
+        "putting further pressure on net interest margins across the sector."
+    )
+
+    def test_full_text_summary_within_word_bounds(self):
+        article = make_article(
+            title="Federal Reserve Raises Benchmark Interest Rate 25 Basis Points",
+            lead_text="The Fed raised rates.",
+        )
+        article.category = "Market"
+        article.full_text = self._FULL_TEXT_BODY
+
+        result = summarize_article(article, self.cats)
+        word_count = len(result.summary.split())
+        assert 100 <= word_count <= 150, f"Word count {word_count} out of [100, 150]"
+
+    def test_full_text_summary_is_non_empty(self):
+        article = make_article(
+            title="Federal Reserve Raises Rates Signals Further Hikes",
+            lead_text="Rate decision.",
+        )
+        article.category = "Market"
+        article.full_text = self._FULL_TEXT_BODY
+
+        result = summarize_article(article, self.cats)
+        assert result.summary.strip() != ""
+
+    def test_fallback_to_lead_when_full_text_empty(self):
+        article = make_article(
+            title="Federal Reserve Holds Rates Steady At Current Level",
+            lead_text=(
+                "The Federal Reserve held its benchmark interest rate steady at 5.25 percent, "
+                "citing balanced risks to inflation and employment at its latest policy meeting. "
+                "Fed Chair Jerome Powell said the committee needed to see more evidence that "
+                "inflation was durably moving back toward its 2 percent target before reducing rates. "
+                "The decision was widely expected by markets after recent economic data showed "
+                "resilient growth alongside easing but still-elevated price pressures."
+            ),
+        )
+        article.category = "Market"
+        article.full_text = ""
+
+        result = summarize_article(article, self.cats)
+        # Lead-text path should produce a non-empty summary within reasonable bounds
+        assert result.summary
+        assert len(result.summary.split()) <= 200
+
+    def test_full_text_content_not_verbatim_in_output(self, tmp_path):
+        """The complete full_text body must never be reproduced wholesale in output."""
+        article = make_article(
+            title="Federal Reserve Raises Interest Rates Benchmark Policy Decision",
+            lead_text="Short lead.",
+        )
+        article.category = "Market"
+        article.full_text = self._FULL_TEXT_BODY  # ~250 words of rich content
+
+        result = summarize_article(article, self.cats)
+        articles_by_cat = {"Market": [result]}
+
+        html_path = render_html(articles_by_cat, self.cats, self.config, tmp_path, "2026-04-14")
+        md_path   = render_markdown(articles_by_cat, self.cats, self.config, tmp_path, "2026-04-14")
+
+        html_content = html_path.read_text()
+        md_content   = md_path.read_text()
+
+        # The entire full_text body must not appear verbatim in output
+        assert self._FULL_TEXT_BODY not in html_content, "full_text reproduced verbatim in HTML"
+        assert self._FULL_TEXT_BODY not in md_content,   "full_text reproduced verbatim in Markdown"
+        # Summary must remain within word-count bounds (not a dump of full_text)
+        assert len(result.summary.split()) <= 150

@@ -235,6 +235,26 @@ settings:
   # Set to false to disable section scraping (RSS-only mode)
   use_section_scraper: true
 
+  # ---------------------------------------------------------------- #
+  # Full-text article enrichment (opt-in)                            #
+  # ---------------------------------------------------------------- #
+  # Set use_full_text: true (or use --full-text CLI flag) to fetch
+  # complete article body for each selected article before summarising.
+  # Requires WSJ credentials (WSJ_EMAIL + WSJ_PASSWORD in .env).
+  use_full_text: false
+
+  # Set use_playwright_fulltext: true to use Playwright (Chromium) for
+  # full-text fetching instead of plain requests.  Playwright handles
+  # JavaScript-rendered pages and the browser-based login form.
+  # Requires: pip install playwright && playwright install chromium
+  # Can also be enabled via the USE_PLAYWRIGHT=1 environment variable.
+  use_playwright_fulltext: false
+
+  full_text_timeout: 15         # seconds per request (requests path)
+  playwright_timeout_ms: 30000  # milliseconds per page action (Playwright)
+  playwright_headless: true     # false = show browser window (useful for debugging login)
+  full_text_rate_sec: 1.0       # pause between article fetches (be respectful)
+
   # Emoji icons shown next to category headers in HTML/Markdown output
   category_icons:
     Global: "🌍"

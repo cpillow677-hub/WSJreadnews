@@ -11,6 +11,7 @@ Options:
     --date YYYY-MM-DD     Override date string      (default: today UTC)
     --dry-run             Run pipeline but skip writing output files
     --no-scrape           RSS-only mode (skip section scraping)
+    --full-text           Fetch full article body for selected articles (requires WSJ auth)
     --log-level LEVEL     DEBUG|INFO|WARNING|ERROR  (default: INFO)
     --max-age-hours N     Override max_age_hours from config
 
@@ -36,7 +37,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import pipeline modules
-from wsj_digest.fetcher import fetch_all_articles
+from wsj_digest.fetcher import _fetch_all_articles_with_session, enrich_with_full_text
 from wsj_digest.scorer import score_articles
 from wsj_digest.selector import select_top_articles
 from wsj_digest.summarizer import summarize_all
@@ -133,6 +134,17 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Disable section scraping; use RSS feeds only.",
     )
     parser.add_argument(
+        "--full-text",
+        action="store_true",
+        default=False,
+        dest="full_text",
+        help=(
+            "Fetch full article body for selected articles before summarising. "
+            "Uses Playwright when use_playwright_fulltext=true or USE_PLAYWRIGHT=1. "
+            "Requires WSJ authentication (WSJ_EMAIL + WSJ_PASSWORD)."
+        ),
+    )
+    parser.add_argument(
         "--log-level",
         type=str,
         default="INFO",
@@ -177,9 +189,12 @@ def main(argv: list[str] | None = None) -> int:
     if args.no_scrape:
         settings["use_section_scraper"] = False
         logger.info("Override: section scraping disabled (--no-scrape)")
+    if args.full_text:
+        settings["use_full_text"] = True
+        logger.info("Override: full-text enrichment enabled (--full-text)")
 
-    output_dir = args.output_dir or Path(settings.get("output_dir", "output"))
-    date_str = args.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    output_dir    = args.output_dir or Path(settings.get("output_dir", "output"))
+    date_str      = args.date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
     category_defs = config["categories"]
 
     logger.info("Date: %s", date_str)
@@ -192,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("-" * 40)
     logger.info("Step 1/5: Fetching articles...")
     try:
-        articles = fetch_all_articles(config)
+        articles, _session = _fetch_all_articles_with_session(config)
     except Exception as exc:
         logger.error("Fetch failed: %s", exc, exc_info=True)
         return 1
@@ -236,6 +251,35 @@ def main(argv: list[str] | None = None) -> int:
         total_selected,
         len(articles_by_category),
     )
+
+    # ---------------------------------------------------------------- #
+    # Step 3.5: Full-text enrichment (opt-in)                           #
+    # ---------------------------------------------------------------- #
+    if settings.get("use_full_text", False):
+        logger.info("-" * 40)
+        use_pw = (
+            os.environ.get("USE_PLAYWRIGHT") == "1"
+            or bool(settings.get("use_playwright_fulltext", False))
+        )
+        mode = "Playwright" if use_pw else "requests"
+        logger.info(
+            "Step 3.5/5: Fetching full article text (%s) for %d articles...",
+            mode, total_selected,
+        )
+        try:
+            articles_by_category = enrich_with_full_text(
+                articles_by_category, _session, config
+            )
+        except Exception as exc:
+            logger.warning(
+                "Full-text enrichment failed: %s — continuing with lead_text only", exc
+            )
+        logger.info("Step 3.5/5 complete")
+    else:
+        logger.info(
+            "Full-text enrichment disabled (use_full_text=false). "
+            "Use --full-text to enable."
+        )
 
     # ---------------------------------------------------------------- #
     # Step 4: Summarise                                                  #

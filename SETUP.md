@@ -94,6 +94,7 @@ Options:
   --date YYYY-MM-DD     Override date string      (default: today UTC)
   --dry-run             Run pipeline but skip writing output files
   --no-scrape           RSS-only mode (skip section scraping)
+  --full-text           Fetch full article body for selected articles
   --log-level LEVEL     DEBUG|INFO|WARNING|ERROR  (default: INFO)
   --max-age-hours N     Override max_age_hours from config
 ```
@@ -150,7 +151,54 @@ On scheduled runs, the workflow automatically commits new digest files back to t
 
 ---
 
-## Optional: Playwright Browser Automation
+## Full-Text Mode with Playwright
+
+WSJ increasingly renders articles with JavaScript. The `--full-text` flag enriches
+selected articles with their complete body text before summarising, producing richer,
+more specific summaries.
+
+### How it works
+
+1. After the 12 articles are selected, the pipeline fetches each article page.
+2. With Playwright: a real Chromium browser logs in to WSJ using your credentials,
+   executes JavaScript, and extracts the fully-rendered article text.
+3. The summariser then uses extractive sentence scoring on the rich content.
+4. Full text is **never reproduced** in output — summaries remain 100–150 words.
+
+### Install Playwright
+
+```bash
+pip install playwright
+playwright install chromium
+```
+
+### Run with full-text mode
+
+```bash
+# Playwright mode (recommended — handles JS-rendered pages)
+USE_PLAYWRIGHT=1 python run_digest.py --full-text
+
+# Or set permanently in config/categories.yaml:
+#   use_full_text: true
+#   use_playwright_fulltext: true
+
+# requests mode (simpler, may get partial content on JS-heavy pages)
+python run_digest.py --full-text
+```
+
+### Troubleshooting
+
+| Issue | Fix |
+|-------|-----|
+| Login loop or blank page | Set `playwright_headless: false` in `config/categories.yaml` to watch the browser |
+| "Playwright not installed" | Run `pip install playwright && playwright install chromium` |
+| Empty full_text in logs | WSJ page may require JS; enable `use_playwright_fulltext: true` |
+| Slow runs | Each article fetch takes ~5–10s. 12 articles ≈ 1–2 minutes extra |
+| CAPTCHA challenge | Log in manually with `playwright_headless: false` on first run |
+
+---
+
+## Optional: Playwright Browser Automation (legacy flag)
 
 For JavaScript-heavy pages that require full browser rendering:
 

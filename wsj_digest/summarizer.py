@@ -1,7 +1,11 @@
 """
 Summarizer — generates a 100–150 word factual summary and 1–2 "why it matters"
-bullets for each article, working only from available metadata (title +
-lead_text).  No full article text is reproduced.
+bullets for each article.
+
+When article.full_text is populated (by enrich_with_full_text), the summariser
+uses extractive sentence scoring on the rich content.  Otherwise it falls back
+to the original lead_text + template approach.  Full article text is never
+reproduced verbatim — the output is always capped at 150 words.
 
 Public interface:
     summarize_article(article, category_defs) -> Article
@@ -190,17 +194,67 @@ def _clean_lead(raw: str) -> str:
 
 
 # ------------------------------------------------------------------ #
-# Sentence splitter                                                     #
+# Sentence splitter + word count                                        #
 # ------------------------------------------------------------------ #
 
 def _split_sentences(text: str) -> list[str]:
-    """Simple sentence splitter — adequate for short RSS leads."""
+    """Simple sentence splitter — adequate for news leads and article body."""
     parts = re.split(r"(?<=[.!?])\s+", text)
     return [p.strip() for p in parts if p.strip()]
 
 
 def _count_words(text: str) -> int:
     return len(text.split())
+
+
+# ------------------------------------------------------------------ #
+# Keyword extraction + sentence scoring (used in full-text path)       #
+# ------------------------------------------------------------------ #
+
+_STOPWORDS = {
+    "a", "an", "the", "and", "or", "but", "in", "on", "at", "to",
+    "for", "of", "with", "by", "from", "as", "is", "was", "are",
+    "were", "be", "been", "has", "have", "had", "its", "it", "this",
+    "that", "will", "would", "could", "after", "before", "into",
+    "over", "under", "than", "then", "when", "where", "how", "who",
+}
+
+
+def _extract_keywords_from_article(article: Article) -> list[str]:
+    """
+    Build a keyword list from the article title for sentence scoring.
+    Filters stopwords and tokens shorter than 3 characters.
+    """
+    tokens = re.findall(r"[A-Za-z&.]{3,}", article.title)
+    return [t for t in tokens if t.lower() not in _STOPWORDS]
+
+
+def _score_sentences(
+    sentences: list[str],
+    keywords: list[str],
+) -> list[tuple[float, str]]:
+    """
+    Score each sentence by keyword density × position weight.
+
+    Formula (sentence at index i of n total):
+        position_weight = 1.0 - (i / max(n, 1)) * 0.5   (1.0 → 0.5)
+        keyword_hits    = count of keywords found (case-insensitive)
+        score           = (keyword_hits / word_count) * 100 * position_weight
+
+    Returns list of (score, sentence) in original order — caller sorts.
+    """
+    n        = len(sentences)
+    kw_lower = [k.lower() for k in keywords]
+    scored   = []
+    for i, sent in enumerate(sentences):
+        if not sent:
+            continue
+        wc              = max(len(sent.split()), 1)
+        hits            = sum(1 for kw in kw_lower if kw in sent.lower())
+        density         = hits / wc
+        position_weight = 1.0 - (i / max(n, 1)) * 0.5
+        scored.append((density * 100.0 * position_weight, sent))
+    return scored
 
 
 # ------------------------------------------------------------------ #
@@ -221,62 +275,95 @@ def _detect_type(article: Article) -> str:
 
 def _build_summary(article: Article, min_words: int = 100, max_words: int = 150) -> str:
     """
-    Builds a factual summary from title + lead_text.
+    Builds a factual 100–150 word summary.
 
-    Pipeline:
-      1. Clean lead_text
-      2. Extract up to 3 sentences
-      3. Inject article-type context phrase
-      4. Enforce word-count bounds
+    Full-text path (article.full_text is non-empty):
+      1. Split full_text into sentences.
+      2. Score each sentence (keyword density × position weight).
+      3. Greedy selection by descending score until ≥ min_words.
+      4. Re-sort selected sentences into original document order.
+      5. Apply shared word-count enforcement.
+
+    Lead-text path (fallback, original behaviour):
+      1. Clean lead_text; take first 3 sentences.
+      2. Inject article-type context phrase.
+      3. Apply shared word-count enforcement.
     """
-    cleaned_lead = _clean_lead(article.lead_text)
-    sentences = _split_sentences(cleaned_lead)
-
-    # Start with the cleaned sentences (up to 3)
-    core_sentences = sentences[:3]
-    core_text = " ".join(core_sentences).strip()
-
-    # If lead is very thin, use the title as the seed sentence
-    if _count_words(core_text) < 15:
-        core_text = article.title + ". " + core_text
-
-    # Inject context phrase based on article type
     article_type = _detect_type(article)
-    context = _CONTEXT_PHRASES.get(article_type, _CONTEXT_PHRASES["default"])
+    context      = _CONTEXT_PHRASES.get(article_type, _CONTEXT_PHRASES["default"])
+    keywords     = _extract_keywords_from_article(article)
+    full_text    = getattr(article, "full_text", "")
 
-    assembled = core_text.rstrip(".") + ". " + context
+    if full_text and full_text.strip():
+        # ---- Full-text path ----
+        all_sentences = _split_sentences(full_text)
+        scored        = _score_sentences(all_sentences, keywords)
 
-    # --- Word count enforcement ---
-    word_count = _count_words(assembled)
+        # Sort by score descending; preserve original index for re-ordering
+        indexed = sorted(
+            enumerate(scored), key=lambda t: t[1][0], reverse=True
+        )  # list of (orig_idx, (score, sent))
+
+        selected_indices: list[int] = []
+        running = 0
+        for orig_idx, (score, sent) in indexed:
+            wc = _count_words(sent)
+            if running >= min_words and running + wc > max_words:
+                continue  # skip over-budget sentences once we've hit the minimum
+            selected_indices.append(orig_idx)
+            running += wc
+            if running >= min_words:
+                break
+
+        # Re-emit in original document order
+        selected_indices.sort()
+        chosen    = [scored[i][1] for i in selected_indices]
+        assembled = " ".join(chosen).strip()
+
+    else:
+        # ---- Lead-text path (unchanged) ----
+        cleaned_lead   = _clean_lead(article.lead_text)
+        sentences      = _split_sentences(cleaned_lead)
+        core_sentences = sentences[:3]
+        core_text      = " ".join(core_sentences).strip()
+
+        if _count_words(core_text) < 15:
+            core_text = article.title + ". " + core_text
+
+        assembled = core_text.rstrip(".") + ". " + context
+
+    # ---- Shared word-count enforcement ----
 
     # Too long: truncate at sentence boundary
-    if word_count > max_words:
-        all_sentences = _split_sentences(assembled)
+    if _count_words(assembled) > max_words:
+        all_sents  = _split_sentences(assembled)
         truncated: list[str] = []
-        running = 0
-        for s in all_sentences:
+        running    = 0
+        for s in all_sents:
             wc = _count_words(s)
             if running + wc > max_words:
                 break
             truncated.append(s)
             running += wc
         assembled = " ".join(truncated)
-        # Ensure it ends with punctuation
-        if assembled and not assembled[-1] in ".!?":
+        if assembled and assembled[-1] not in ".!?":
             assembled += "."
 
-    # Too short: pad with additional context sentences
+    # Too short: append context phrase then generic padding
     if _count_words(assembled) < min_words:
-        padding_sentences = [
-            f"The story originated from the WSJ {article.source_section} section.",
-            "Markets and policymakers are watching developments closely for further clarity.",
-            "Analysts note that the full implications may take time to materialise.",
-            "Investors are advised to monitor follow-up reporting for additional details.",
-        ]
-        for pad in padding_sentences:
-            assembled = assembled.rstrip(".") + ". " + pad
-            if _count_words(assembled) >= min_words:
-                break
+        if context not in assembled:
+            assembled = assembled.rstrip(".") + ". " + context
+        if _count_words(assembled) < min_words:
+            padding_sentences = [
+                f"The story originated from the WSJ {article.source_section} section.",
+                "Markets and policymakers are watching developments closely for further clarity.",
+                "Analysts note that the full implications may take time to materialise.",
+                "Investors are advised to monitor follow-up reporting for additional details.",
+            ]
+            for pad in padding_sentences:
+                assembled = assembled.rstrip(".") + ". " + pad
+                if _count_words(assembled) >= min_words:
+                    break
 
     return assembled.strip()
 
@@ -287,13 +374,17 @@ def _build_summary(article: Article, min_words: int = 100, max_words: int = 150)
 
 def _build_why(article: Article, category_defs: dict) -> list[str]:
     """Return 1–2 bullet strings for why_it_matters."""
-    category = article.category or "Global"
+    category  = article.category or "Global"
     templates = _WHY_TEMPLATES.get(category, _WHY_TEMPLATES["Global"])
 
+    # Prefer full_text for entity extraction when available (more context)
+    full_text     = getattr(article, "full_text", "")
+    enriched_text = full_text if full_text else article.lead_text
+
     company = _extract_company(article.title)
-    region = _extract_region(article.title, article.lead_text)
-    asset = _extract_asset(article.title, article.lead_text)
-    sector = _extract_sector(article.title, article.lead_text)
+    region  = _extract_region(article.title, enriched_text)
+    asset   = _extract_asset(article.title, enriched_text)
+    sector  = _extract_sector(article.title, enriched_text)
 
     # Fill placeholders
     filled = []

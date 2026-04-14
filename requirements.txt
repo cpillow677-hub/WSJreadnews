@@ -28,10 +28,13 @@ PyYAML==6.0.2
 pytest==8.3.4
 
 # ------------------------------------------------------------------ #
-# Optional: browser automation (Playwright)                           #
-# Only needed when USE_PLAYWRIGHT=1                                   #
-# Install separately:                                                  #
-#   pip install playwright==1.45.0                                    #
+# Optional: Playwright browser automation                              #
+# Required for --full-text mode with use_playwright_fulltext: true    #
+# or USE_PLAYWRIGHT=1.  Playwright handles JS-rendered WSJ pages and  #
+# the browser-based login form.                                        #
+#                                                                      #
+# Install separately (not in this file to avoid mandatory dep):        #
+#   pip install playwright                                             #
 #   playwright install chromium                                        #
 # ------------------------------------------------------------------ #
 # playwright==1.45.0
