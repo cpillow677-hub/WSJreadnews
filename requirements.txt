@@ -1,0 +1,37 @@
+# WSJ Digest — Python dependencies
+# Install with:  pip install -r requirements.txt
+# Python 3.11+ required
+
+# HTTP + HTML parsing
+requests==2.32.3
+beautifulsoup4==4.12.3
+lxml==5.3.0
+
+# RSS feed parsing (date utilities)
+feedparser==6.0.11
+
+# Fuzzy string matching (deduplication)
+rapidfuzz==3.9.3
+
+# HTML templating
+Jinja2==3.1.4
+
+# Environment variable loading from .env files
+python-dotenv==1.0.1
+
+# YAML configuration
+PyYAML==6.0.2
+
+# ------------------------------------------------------------------ #
+# Development / testing                                                #
+# ------------------------------------------------------------------ #
+pytest==8.3.4
+
+# ------------------------------------------------------------------ #
+# Optional: browser automation (Playwright)                           #
+# Only needed when USE_PLAYWRIGHT=1                                   #
+# Install separately:                                                  #
+#   pip install playwright==1.45.0                                    #
+#   playwright install chromium                                        #
+# ------------------------------------------------------------------ #
+# playwright==1.45.0

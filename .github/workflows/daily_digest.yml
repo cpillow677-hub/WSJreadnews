@@ -1,0 +1,90 @@
+name: WSJ Daily Digest
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC (after major US/Asia market open, before European close)
+    - cron: "0 6 * * *"
+
+  # Allow manual runs from the GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      log_level:
+        description: "Log verbosity (DEBUG / INFO / WARNING)"
+        required: false
+        default: "INFO"
+      dry_run:
+        description: "Dry run — build pipeline but skip file output (true/false)"
+        required: false
+        default: "false"
+
+jobs:
+  generate-digest:
+    name: Generate WSJ Daily Digest
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      # ---------------------------------------------------------------- #
+      # 1. Checkout                                                        #
+      # ---------------------------------------------------------------- #
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------------- #
+      # 2. Python setup                                                    #
+      # ---------------------------------------------------------------- #
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # ---------------------------------------------------------------- #
+      # 3. Set date env var (used by artifact upload)                     #
+      # ---------------------------------------------------------------- #
+      - name: Set TODAY env var
+        run: echo "TODAY=$(date -u +%Y-%m-%d)" >> $GITHUB_ENV
+
+      # ---------------------------------------------------------------- #
+      # 4. Run pipeline                                                    #
+      # ---------------------------------------------------------------- #
+      - name: Run digest pipeline
+        env:
+          WSJ_EMAIL:    ${{ secrets.WSJ_EMAIL }}
+          WSJ_PASSWORD: ${{ secrets.WSJ_PASSWORD }}
+        run: |
+          python run_digest.py \
+            --log-level "${{ github.event.inputs.log_level || 'INFO' }}" \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      # ---------------------------------------------------------------- #
+      # 5. Upload output files as artifacts                               #
+      # ---------------------------------------------------------------- #
+      - name: Upload digest artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: daily-digest-${{ env.TODAY }}
+          path: output/
+          retention-days: 30
+
+      # ---------------------------------------------------------------- #
+      # 6. (Optional) Commit digest back to the repository               #
+      #    Only runs on scheduled trigger to avoid polluting PRs          #
+      # ---------------------------------------------------------------- #
+      - name: Commit digest to repository
+        if: github.event_name == 'schedule'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/
+          # Only commit if there are new/changed files
+          if git diff --cached --quiet; then
+            echo "No new digest files to commit."
+          else
+            git commit -m "digest: ${{ env.TODAY }}"
+            git push
+          fi

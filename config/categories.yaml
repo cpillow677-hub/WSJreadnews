@@ -1,0 +1,243 @@
+# WSJ Digest — Category Definitions and Pipeline Settings
+# Each category block drives fetching, scoring, classification, and selection.
+
+categories:
+  Global:
+    description: "International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations"
+    keywords:
+      primary:
+        - geopolitics
+        - trade war
+        - tariff
+        - sanctions
+        - NATO
+        - G7
+        - G20
+        - IMF
+        - World Bank
+        - WTO
+        - foreign policy
+        - diplomatic
+        - embassy
+        - treaty
+        - global economy
+        - international
+        - export
+        - import
+        - currency war
+        - trade deal
+        - bilateral
+        - multilateral
+      secondary:
+        - war
+        - conflict
+        - election
+        - government
+        - inflation
+        - GDP
+        - central bank
+        - deficit
+        - debt
+        - refugee
+        - summit
+        - alliance
+        - military
+    wsj_sections:
+      - world
+      - economy
+      - politics
+    rss_feeds:
+      - url: "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
+        name: "WSJ World News"
+      - url: "https://feeds.a.dj.com/rss/RSSOpinion.xml"
+        name: "WSJ Opinion"
+    target_count: 3
+
+  Market:
+    description: "Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures"
+    keywords:
+      primary:
+        - "S&P 500"
+        - Dow Jones
+        - Nasdaq
+        - yield
+        - Treasury
+        - bond
+        - interest rate
+        - Federal Reserve
+        - Fed
+        - forex
+        - dollar
+        - euro
+        - yen
+        - oil
+        - gold
+        - commodity
+        - futures
+        - ETF
+        - index
+        - VIX
+        - credit spread
+        - rate hike
+        - rate cut
+        - quantitative easing
+        - quantitative tightening
+        - basis points
+      secondary:
+        - market
+        - rally
+        - selloff
+        - sell-off
+        - inflation
+        - recession
+        - GDP
+        - jobs report
+        - payroll
+        - CPI
+        - PPI
+        - hedge fund
+        - asset class
+        - risk-off
+        - risk-on
+    wsj_sections:
+      - markets
+      - economy
+    rss_feeds:
+      - url: "https://feeds.a.dj.com/rss/RSSMarketsMain.xml"
+        name: "WSJ Markets Main"
+      - url: "https://feeds.a.dj.com/rss/WSJRSS.xml"
+        name: "WSJ Top Stories"
+    target_count: 3
+
+  Stock:
+    description: "Single-company developments, earnings reports, analyst upgrades/downgrades, M&A, IPOs, CEO changes, product launches"
+    keywords:
+      primary:
+        - earnings
+        - revenue
+        - EPS
+        - profit
+        - loss
+        - guidance
+        - outlook
+        - upgrade
+        - downgrade
+        - buy rating
+        - sell rating
+        - merger
+        - acquisition
+        - IPO
+        - buyback
+        - dividend
+        - CEO
+        - CFO
+        - layoffs
+        - restructuring
+        - spinoff
+        - activist investor
+        - short seller
+      secondary:
+        - shares
+        - stock
+        - quarterly
+        - annual
+        - beat
+        - miss
+        - analyst
+        - target price
+        - valuation
+        - market cap
+        - shareholder
+        - board
+        - investor
+    wsj_sections:
+      - business
+      - markets/stocks
+    rss_feeds:
+      - url: "https://feeds.a.dj.com/rss/RSSWSJD.xml"
+        name: "WSJ US Business"
+    target_count: 3
+
+  Tech:
+    description: "Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy"
+    keywords:
+      primary:
+        - artificial intelligence
+        - " AI "
+        - machine learning
+        - semiconductor
+        - chip
+        - GPU
+        - cloud
+        - software
+        - platform
+        - cybersecurity
+        - antitrust
+        - data privacy
+        - regulation
+        - big tech
+        - startup
+        - venture capital
+        - autonomous
+        - robotics
+        - quantum computing
+        - data center
+        - large language model
+        - LLM
+        - generative AI
+      secondary:
+        - Apple
+        - Microsoft
+        - Google
+        - Alphabet
+        - Meta
+        - Amazon
+        - Nvidia
+        - Intel
+        - AMD
+        - TSMC
+        - OpenAI
+        - Anthropic
+        - tech
+        - digital
+        - app
+        - smartphone
+        - broadband
+        - 5G
+    wsj_sections:
+      - tech
+    rss_feeds:
+      - url: "https://feeds.a.dj.com/rss/RSSWSJD.xml"
+        name: "WSJ Technology"
+    target_count: 3
+
+# ------------------------------------------------------------------ #
+# Global pipeline settings                                            #
+# ------------------------------------------------------------------ #
+settings:
+  total_candidates_target: 60      # articles to collect before scoring
+  min_candidates_per_category: 5   # minimum pool size before triggering scrape fallback
+  dedup_threshold: 85              # rapidfuzz token_sort_ratio threshold (0–100)
+  max_age_hours: 48                # reject articles older than this
+
+  scoring:
+    importance_weight: 0.45
+    recency_weight: 0.35
+    market_relevance_weight: 0.20
+
+  summary:
+    min_words: 100
+    max_words: 150
+
+  output_dir: "output"
+  log_level: "INFO"
+
+  # Set to false to disable section scraping (RSS-only mode)
+  use_section_scraper: true
+
+  # Emoji icons shown next to category headers in HTML/Markdown output
+  category_icons:
+    Global: "🌍"
+    Market: "📈"
+    Stock: "🏢"
+    Tech: "💻"
