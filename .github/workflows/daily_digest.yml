@@ -17,11 +17,22 @@ on:
         required: false
         default: "false"
 
+# Allow the workflow to push to the repo (for docs/ update) and deploy Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   generate-digest:
     name: Generate WSJ Daily Digest
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+
+    # Required for the deploy-pages action
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy-pages.outputs.page_url }}
 
     steps:
       # ---------------------------------------------------------------- #
@@ -29,6 +40,9 @@ jobs:
       # ---------------------------------------------------------------- #
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Fetch full history so we can push docs/ back
+          fetch-depth: 0
 
       # ---------------------------------------------------------------- #
       # 2. Python setup                                                    #
@@ -43,7 +57,7 @@ jobs:
         run: pip install -r requirements.txt
 
       # ---------------------------------------------------------------- #
-      # 3. Set date env var (used by artifact upload)                     #
+      # 3. Set date env var                                               #
       # ---------------------------------------------------------------- #
       - name: Set TODAY env var
         run: echo "TODAY=$(date -u +%Y-%m-%d)" >> $GITHUB_ENV
@@ -61,7 +75,7 @@ jobs:
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
 
       # ---------------------------------------------------------------- #
-      # 5. Upload output files as artifacts                               #
+      # 5. Upload output files as artifacts (30-day retention)            #
       # ---------------------------------------------------------------- #
       - name: Upload digest artifacts
         uses: actions/upload-artifact@v4
@@ -72,19 +86,54 @@ jobs:
           retention-days: 30
 
       # ---------------------------------------------------------------- #
-      # 6. (Optional) Commit digest back to the repository               #
-      #    Only runs on scheduled trigger to avoid polluting PRs          #
+      # 6. Copy report to docs/ and rebuild Pages index                   #
       # ---------------------------------------------------------------- #
-      - name: Commit digest to repository
-        if: github.event_name == 'schedule'
+      - name: Copy report to docs/reports/
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          mkdir -p docs/reports
+          # Copy the generated HTML report into the Pages directory
+          if [ -f "output/daily_digest_$TODAY.html" ]; then
+            cp "output/daily_digest_$TODAY.html" "docs/reports/$TODAY.html"
+            echo "Copied daily_digest_$TODAY.html → docs/reports/$TODAY.html"
+          else
+            echo "No output file found for $TODAY — skipping copy"
+          fi
+
+      - name: Rebuild Pages index
+        if: github.event.inputs.dry_run != 'true'
+        run: python scripts/build_pages.py
+
+      # ---------------------------------------------------------------- #
+      # 7. Commit updated docs/ back to the repository                    #
+      # ---------------------------------------------------------------- #
+      - name: Commit updated docs/ to repository
+        if: github.event.inputs.dry_run != 'true'
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/
-          # Only commit if there are new/changed files
+          git add docs/
           if git diff --cached --quiet; then
-            echo "No new digest files to commit."
+            echo "No changes in docs/ — skipping commit."
           else
-            git commit -m "digest: ${{ env.TODAY }}"
+            git commit -m "pages: add digest $TODAY"
             git push
           fi
+
+      # ---------------------------------------------------------------- #
+      # 8. Deploy docs/ to GitHub Pages                                   #
+      # ---------------------------------------------------------------- #
+      - name: Setup Pages
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/configure-pages@v4
+
+      - name: Upload Pages artifact
+        if: github.event.inputs.dry_run != 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/
+
+      - name: Deploy to GitHub Pages
+        if: github.event.inputs.dry_run != 'true'
+        id: deploy-pages
+        uses: actions/deploy-pages@v4

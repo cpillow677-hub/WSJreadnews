@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSJ Daily Digest — Archive</title>
+  <style>
+    :root {
+      --navy:   #003366;
+      --red:    #b30000;
+      --bg:     #f5f5f0;
+      --card:   #ffffff;
+      --text:   #1a1a1a;
+      --muted:  #666666;
+      --border: #dddddd;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      line-height: 1.6;
+    }
+    /* ---- Header ---- */
+    .site-header {
+      border-bottom: 3px double var(--navy);
+      padding-bottom: 1.2rem;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    .site-header h1 {
+      font-size: 2.4rem;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+    .site-header .tagline {
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+    .site-header .updated {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.6rem;
+      font-family: Arial, sans-serif;
+    }
+    /* ---- Section title ---- */
+    .section-title {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1.2rem;
+    }
+    /* ---- Featured (latest) ---- */
+    .featured {
+      background: var(--card);
+      border: 2px solid var(--navy);
+      border-radius: 4px;
+      padding: 1.5rem 1.8rem;
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: inherit;
+      transition: box-shadow 0.15s ease;
+    }
+    .featured:hover { box-shadow: 0 4px 12px rgba(0,51,102,0.15); }
+    .featured .label {
+      font-family: Arial, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.4rem;
+    }
+    .featured .date {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: var(--navy);
+    }
+    .featured .weekday {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+    .featured .arrow {
+      font-size: 1.8rem;
+      color: var(--navy);
+      flex-shrink: 0;
+    }
+    /* ---- Archive grid ---- */
+    .archive-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.8rem;
+      margin-bottom: 2rem;
+    }
+    .archive-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .archive-card:hover {
+      border-color: var(--navy);
+      box-shadow: 0 2px 8px rgba(0,51,102,0.1);
+    }
+    .archive-card .card-date {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--navy);
+    }
+    .archive-card .card-weekday {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-top: 0.2rem;
+    }
+    /* ---- Footer ---- */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+    /* ---- Empty state ---- */
+    .empty {
+      text-align: center;
+      padding: 3rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <h1>WSJ Daily Digest</h1>
+    <p class="tagline">Curated Wall Street Journal highlights — Global · Market · Stock · Tech</p>
+    <p class="updated">Updated: 2026-04-15 12:09 UTC</p>
+  </header>
+
+    <p class="section-title">Latest Report</p>
+  <a class="featured" href="reports/2026-04-14.html">
+    <div>
+      <div class="label">&#9679; Latest</div>
+      <div class="date">April 14, 2026</div>
+      <div class="weekday">Tuesday</div>
+    </div>
+    <div class="arrow">&#8594;</div>
+  </a>
+
+
+    <p class="section-title">Archive (1 reports)</p>
+  <div class="archive-grid">
+    <a class="archive-card" href="reports/2026-04-14.html">
+      <div class="card-date">April 14, 2026</div>
+      <div class="card-weekday">Tuesday</div>
+    </a>
+  </div>
+
+
+  <footer class="site-footer">
+    Generated automatically each day at 06:00 UTC &nbsp;·&nbsp;
+    Powered by <a href="https://github.com/cpillow677-hub/WSJreadnews" style="color:var(--navy);">WSJreadnews</a>
+  </footer>
+
+</body>
+</html>
