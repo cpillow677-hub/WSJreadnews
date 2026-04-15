@@ -227,9 +227,8 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 {% endfor %}
 
 <footer>
-  <p>Generated {{ generated_at }} UTC &bull; Source: Wall Street Journal (wsj.com)</p>
-  <p>This digest summarises publicly available headlines and lead text.
-     Full articles require a WSJ subscription. No full article text is reproduced.</p>
+  <p>Generated {{ generated_at }} UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; Wall Street Journal</p>
+  <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
 </footer>
 
 </body>
@@ -364,8 +363,7 @@ def render_markdown(
     lines.append(f"# WSJ Daily Digest — {date_formatted}")
     lines.append(f"*{total} stories &nbsp;|&nbsp; Generated {generated_at} UTC*")
     lines.append("")
-    lines.append("> This digest summarises publicly available WSJ headlines and lead text.")
-    lines.append("> Full articles require a WSJ subscription.")
+    lines.append("> Sources: Yahoo Finance · CNBC · Wall Street Journal. Summaries of public headlines only.")
     lines.append("")
 
     for cat_name, articles in articles_by_category.items():

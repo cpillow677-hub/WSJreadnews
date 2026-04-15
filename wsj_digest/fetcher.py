@@ -62,13 +62,15 @@ SECTION_URLS = {
     "business": "https://www.wsj.com/business",
 }
 
-# Known public RSS feeds (merged with config yaml feeds at runtime)
+# Current financial news RSS feeds (feeds.a.dj.com was frozen at 2025-01-27)
 DEFAULT_RSS_FEEDS = [
-    {"url": "https://feeds.a.dj.com/rss/WSJRSS.xml",        "section": "top"},
-    {"url": "https://feeds.a.dj.com/rss/RSSWorldNews.xml",  "section": "world"},
-    {"url": "https://feeds.a.dj.com/rss/RSSMarketsMain.xml","section": "markets"},
-    {"url": "https://feeds.a.dj.com/rss/RSSWSJD.xml",       "section": "business"},
-    {"url": "https://feeds.a.dj.com/rss/RSSOpinion.xml",    "section": "opinion"},
+    # Yahoo Finance — broad financial/market/tech/world news, updated in real-time
+    {"url": "https://finance.yahoo.com/news/rssindex",       "section": "top",      "name": "Yahoo Finance"},
+    # CNBC business and markets sections
+    {"url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",  "section": "business", "name": "CNBC Business"},
+    {"url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "section": "markets",  "name": "CNBC Markets"},
+    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",  "section": "world",    "name": "CNBC World"},
+    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",  "section": "tech",     "name": "CNBC Technology"},
 ]
 
 # CSS selector cascade for WSJ article body (used by both requests and Playwright paths)
@@ -694,14 +696,12 @@ def _fetch_all_articles_with_session(
     articles = rss.fetch()
     logger.info("RSS fetch: %d raw candidates", len(articles))
 
-    # Section scraper pass (only if authenticated and enabled)
-    if use_scraper and authenticated:
-        scraper  = SectionScraper(session, config)
-        scraped  = scraper.fetch()
+    # Section scraper pass (run always when enabled; auth improves results but isn't required)
+    if use_scraper:
+        scraper = SectionScraper(session, config)
+        scraped = scraper.fetch()
         logger.info("Section scrape: %d additional candidates", len(scraped))
         articles.extend(scraped)
-    elif use_scraper and not authenticated:
-        logger.info("Skipping section scraper (not authenticated).")
 
     # Age filter — with fallback for system clock / feed date mismatch.
     # When the system clock is ahead of the feed (e.g. a dev environment

@@ -46,11 +46,6 @@ categories:
       - world
       - economy
       - politics
-    rss_feeds:
-      - url: "https://feeds.a.dj.com/rss/RSSWorldNews.xml"
-        name: "WSJ World News"
-      - url: "https://feeds.a.dj.com/rss/RSSOpinion.xml"
-        name: "WSJ Opinion"
     target_count: 3
 
   Market:
@@ -102,11 +97,6 @@ categories:
     wsj_sections:
       - markets
       - economy
-    rss_feeds:
-      - url: "https://feeds.a.dj.com/rss/RSSMarketsMain.xml"
-        name: "WSJ Markets Main"
-      - url: "https://feeds.a.dj.com/rss/WSJRSS.xml"
-        name: "WSJ Top Stories"
     target_count: 3
 
   Stock:
@@ -153,9 +143,6 @@ categories:
     wsj_sections:
       - business
       - markets/stocks
-    rss_feeds:
-      - url: "https://feeds.a.dj.com/rss/RSSWSJD.xml"
-        name: "WSJ US Business"
     target_count: 3
 
   Tech:
@@ -206,9 +193,6 @@ categories:
         - 5G
     wsj_sections:
       - tech
-    rss_feeds:
-      - url: "https://feeds.a.dj.com/rss/RSSWSJD.xml"
-        name: "WSJ Technology"
     target_count: 3
 
 # ------------------------------------------------------------------ #
