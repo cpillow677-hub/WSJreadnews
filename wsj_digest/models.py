@@ -59,6 +59,23 @@ class Article:
         delta = now - pub
         return delta.total_seconds() / 3600
 
+    def _source_label(self) -> str:
+        """Short display name for the article's source."""
+        feed = self.source_feed.lower()
+        if "yahoo" in feed:
+            return "Yahoo Finance"
+        if "cnbc" in feed:
+            return "CNBC"
+        if "wsj" in feed or "wall street" in feed:
+            return "WSJ"
+        if "investor" in feed or "ibd" in feed:
+            return "Investor's Business Daily"
+        if "reuters" in feed:
+            return "Reuters"
+        if "bloomberg" in feed:
+            return "Bloomberg"
+        return self.source_feed
+
     def to_dict(self) -> dict:
         """Serialise to a plain dict suitable for JSON or template rendering."""
         pub = self.publish_time
@@ -69,6 +86,7 @@ class Article:
             "url": self.url,
             "source_section": self.source_section,
             "source_feed": self.source_feed,
+            "source_label": self._source_label(),
             "publish_time": pub.isoformat(),
             "publish_time_human": pub.strftime("%b %d, %Y %H:%M UTC"),
             "category": self.category,

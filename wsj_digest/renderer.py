@@ -121,6 +121,22 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       font-family: Arial, sans-serif;
       margin-bottom: 0.7rem;
     }
+    .source-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+      letter-spacing: 0.3px;
+    }
+    .source-yahoo  { background: #6001d2; color: #fff; }
+    .source-cnbc   { background: #c00; color: #fff; }
+    .source-wsj    { background: #003366; color: #fff; }
+    .source-ibd    { background: #e06000; color: #fff; }
+    .source-other  { background: #555; color: #fff; }
     .score-badge {
       display: inline-block;
       background: var(--navy);
@@ -176,7 +192,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <body>
 
 <header>
-  <h1>WSJ Daily Digest</h1>
+  <h1>Daily Financial Digest</h1>
   <p class="digest-meta">
     {{ date_formatted }} &nbsp;&bull;&nbsp;
     {{ total_count }} stories across {{ category_count }} categories &nbsp;&bull;&nbsp;
@@ -202,7 +218,12 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
         {{ article.title }}
       </a>
       <div class="article-meta">
-        {{ article.source_section }} &bull;
+        {% set sl = article.source_label %}
+        {% if "Yahoo" in sl %}<span class="source-badge source-yahoo">{{ sl }}</span>
+        {% elif "CNBC" in sl %}<span class="source-badge source-cnbc">{{ sl }}</span>
+        {% elif "WSJ" in sl %}<span class="source-badge source-wsj">{{ sl }}</span>
+        {% elif "Investor" in sl %}<span class="source-badge source-ibd">{{ sl }}</span>
+        {% else %}<span class="source-badge source-other">{{ sl }}</span>{% endif %}
         {{ article.publish_time_human }}
         {% if article.author %}&bull; {{ article.author }}{% endif %}
         <span class="score-badge">Score&nbsp;{{ article.total_score }}</span>
@@ -360,7 +381,7 @@ def render_markdown(
     total = sum(len(v) for v in articles_by_category.values())
     lines: list[str] = []
 
-    lines.append(f"# WSJ Daily Digest — {date_formatted}")
+    lines.append(f"# Daily Financial Digest — {date_formatted}")
     lines.append(f"*{total} stories &nbsp;|&nbsp; Generated {generated_at} UTC*")
     lines.append("")
     lines.append("> Sources: Yahoo Finance · CNBC · Wall Street Journal. Summaries of public headlines only.")
@@ -394,7 +415,7 @@ def render_markdown(
             score = d.get("total_score", 0.0)
 
             lines.append(f"### {i}. [{d['title']}]({d['url']})")
-            lines.append(f"**{d['source_section']}{author} | {pub_human} | Score: {score}**")
+            lines.append(f"**{d['source_label']} | {pub_human}{author} | Score: {score}**")
             lines.append("")
             lines.append(d.get("summary", ""))
             lines.append("")
@@ -408,7 +429,7 @@ def render_markdown(
 
     lines.append("---")
     lines.append("")
-    lines.append(f"*WSJ Daily Digest · {generated_at} UTC*")
+    lines.append(f"*Daily Financial Digest · {generated_at} UTC*")
 
     md_content = "\n".join(lines)
 

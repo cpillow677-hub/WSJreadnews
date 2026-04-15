@@ -195,6 +195,89 @@ categories:
       - tech
     target_count: 3
 
+  AI_Apps:
+    description: "New AI tools, products, model releases, and applications across all industries"
+    keywords:
+      primary:
+        - AI tool
+        - AI app
+        - AI product
+        - AI model
+        - model release
+        - AI feature
+        - AI agent
+        - AI assistant
+        - generative AI
+        - LLM release
+        - AI launch
+        - open source model
+        - AI platform
+        - AI startup
+        - new AI
+        - AI system
+      secondary:
+        - OpenAI
+        - Anthropic
+        - Claude
+        - ChatGPT
+        - Gemini
+        - Grok
+        - Llama
+        - multimodal
+        - benchmark
+        - AI capabilities
+        - foundation model
+        - reasoning model
+        - AI demo
+        - AI beta
+    wsj_sections:
+      - tech
+    target_count: 3
+
+  Industry_Academia:
+    description: "Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts"
+    keywords:
+      primary:
+        - layoffs
+        - job cuts
+        - laid off
+        - restructuring
+        - workforce reduction
+        - downsizing
+        - reduction in force
+        - mass firing
+        - research breakthrough
+        - study finds
+        - new research
+        - academic paper
+        - peer-reviewed
+        - scientists discover
+      secondary:
+        - employees
+        - workers
+        - cut jobs
+        - eliminate positions
+        - university
+        - scientists
+        - laboratory
+        - research
+        - discovery
+        - innovation
+        - spinoff
+        - RIF
+    wsj_sections:
+      - business
+      - tech
+    target_count: 3
+
+  Portfolio:
+    description: "Your personal watchlist — add stock tickers and company names below"
+    keywords:
+      primary: []    # TODO: add your stock tickers here, e.g. - AAPL, - TSLA
+      secondary: []  # TODO: add company names here, e.g. - Apple, - Tesla
+    wsj_sections: []
+    target_count: 3
+
 # ------------------------------------------------------------------ #
 # Global pipeline settings                                            #
 # ------------------------------------------------------------------ #
@@ -245,3 +328,6 @@ settings:
     Market: "📈"
     Stock: "🏢"
     Tech: "💻"
+    AI_Apps: "🤖"
+    Industry_Academia: "🏭"
+    Portfolio: "⭐"

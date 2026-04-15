@@ -413,7 +413,7 @@ class TestRenderer:
         assert out.exists()
         content = out.read_text()
         assert "<html" in content
-        assert "WSJ Daily Digest" in content
+        assert "Daily Financial Digest" in content
         assert "2026-04-14" in str(out)
 
     def test_render_html_contains_categories(self, tmp_path):
@@ -434,7 +434,7 @@ class TestRenderer:
         out = render_markdown(articles, self.cats, self.config, tmp_path, "2026-04-14")
         assert out.exists()
         content = out.read_text()
-        assert content.startswith("# WSJ Daily Digest")
+        assert content.startswith("# Daily Financial Digest")
 
     def test_render_markdown_contains_all_categories(self, tmp_path):
         articles = self._build_articles_by_category()
@@ -607,7 +607,7 @@ class TestEndToEndPipeline:
             assert cat in html
 
         md = md_path.read_text()
-        assert md.startswith("# WSJ Daily Digest")
+        assert md.startswith("# Daily Financial Digest")
 
     @patch("wsj_digest.fetcher._login", return_value=False)
     @patch("requests.Session.get")
