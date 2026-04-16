@@ -27,7 +27,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WSJ Digest &ndash; {{ date_str }}</title>
+  <title>Daily Financial Digest &ndash; {{ date_str }}</title>
   <style>
     :root {
       --navy:   #003366;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-run_digest.py — CLI entrypoint for the WSJ Daily Digest pipeline.
+run_digest.py — CLI entrypoint for the Daily Financial Digest pipeline.
 
 Usage:
     python run_digest.py [OPTIONS]
@@ -98,7 +98,7 @@ def setup_logging(level_name: str) -> None:
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="run_digest",
-        description="WSJ Daily Digest — fetch, score, summarise, and render top stories.",
+        description="Daily Financial Digest — fetch, score, summarise, and render top stories.",
     )
     parser.add_argument(
         "--config",
@@ -171,7 +171,7 @@ def main(argv: list[str] | None = None) -> int:
     setup_logging(args.log_level)
 
     logger.info("=" * 60)
-    logger.info("WSJ Digest Pipeline — Start")
+    logger.info("Daily Financial Digest Pipeline — Start")
     logger.info("=" * 60)
 
     # --- Load config ---
@@ -319,7 +319,7 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Step 5/5 complete")
 
     logger.info("=" * 60)
-    logger.info("WSJ Digest Pipeline — Complete")
+    logger.info("Daily Financial Digest Pipeline — Complete")
     logger.info("=" * 60)
     return 0
 
