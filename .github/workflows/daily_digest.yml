@@ -2,8 +2,8 @@ name: Daily Financial Digest
 
 on:
   schedule:
-    # Run daily at 06:00 UTC = 14:00 Taiwan time (UTC+8)
-    - cron: "0 6 * * *"
+    # Run daily at 08:00 UTC = 16:00 Taiwan time (UTC+8)
+    - cron: "0 8 * * *"
 
   # Allow manual runs from the GitHub Actions UI
   workflow_dispatch:
