@@ -271,10 +271,28 @@ categories:
     target_count: 3
 
   Portfolio:
-    description: "Your personal watchlist — add stock tickers and company names below"
+    description: "Personal watchlist: IonQ (IONQ) · Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO)"
     keywords:
-      primary: []    # TODO: add your stock tickers here, e.g. - AAPL, - TSLA
-      secondary: []  # TODO: add company names here, e.g. - Apple, - Tesla
+      primary:
+        - IonQ
+        - Oracle
+        - Broadcom
+        - "Quantum Computing"
+        - IONQ
+        - ORCL
+        - QUBT
+        - AVGO
+      secondary:
+        - quantum computer
+        - quantum hardware
+        - trapped ion
+        - cloud database
+        - enterprise software
+        - ERP
+        - semiconductor supply
+        - networking chip
+        - AI chip
+        - custom silicon
     wsj_sections: []
     target_count: 3
 

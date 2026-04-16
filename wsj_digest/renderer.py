@@ -132,11 +132,13 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       vertical-align: middle;
       letter-spacing: 0.3px;
     }
-    .source-yahoo  { background: #6001d2; color: #fff; }
-    .source-cnbc   { background: #c00; color: #fff; }
-    .source-wsj    { background: #003366; color: #fff; }
-    .source-ibd    { background: #e06000; color: #fff; }
-    .source-other  { background: #555; color: #fff; }
+    .source-yahoo      { background: #6001d2; color: #fff; }
+    .source-cnbc       { background: #c00;    color: #fff; }
+    .source-wsj        { background: #003366; color: #fff; }
+    .source-economist  { background: #e3120b; color: #fff; }
+    .source-cnn        { background: #cc0000; color: #fff; }
+    .source-ibd        { background: #e06000; color: #fff; }
+    .source-other      { background: #555;    color: #fff; }
     .score-badge {
       display: inline-block;
       background: var(--navy);
@@ -221,6 +223,8 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
         {% set sl = article.source_label %}
         {% if "Yahoo" in sl %}<span class="source-badge source-yahoo">{{ sl }}</span>
         {% elif "CNBC" in sl %}<span class="source-badge source-cnbc">{{ sl }}</span>
+        {% elif "Economist" in sl %}<span class="source-badge source-economist">{{ sl }}</span>
+        {% elif "CNN" in sl %}<span class="source-badge source-cnn">{{ sl }}</span>
         {% elif "WSJ" in sl %}<span class="source-badge source-wsj">{{ sl }}</span>
         {% elif "Investor" in sl %}<span class="source-badge source-ibd">{{ sl }}</span>
         {% else %}<span class="source-badge source-other">{{ sl }}</span>{% endif %}
@@ -248,7 +252,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 {% endfor %}
 
 <footer>
-  <p>Generated {{ generated_at }} UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; Wall Street Journal</p>
+  <p>Generated {{ generated_at }} UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; Wall Street Journal</p>
   <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
 </footer>
 
@@ -384,7 +388,7 @@ def render_markdown(
     lines.append(f"# Daily Financial Digest — {date_formatted}")
     lines.append(f"*{total} stories &nbsp;|&nbsp; Generated {generated_at} UTC*")
     lines.append("")
-    lines.append("> Sources: Yahoo Finance · CNBC · Wall Street Journal. Summaries of public headlines only.")
+    lines.append("> Sources: Yahoo Finance · CNBC · CNN · The Economist · Wall Street Journal. Summaries of public headlines only.")
     lines.append("")
 
     for cat_name, articles in articles_by_category.items():

@@ -65,12 +65,18 @@ SECTION_URLS = {
 # Current financial news RSS feeds (feeds.a.dj.com was frozen at 2025-01-27)
 DEFAULT_RSS_FEEDS = [
     # Yahoo Finance — broad financial/market/tech/world news, updated in real-time
-    {"url": "https://finance.yahoo.com/news/rssindex",       "section": "top",      "name": "Yahoo Finance"},
+    {"url": "https://finance.yahoo.com/news/rssindex",                            "section": "top",      "name": "Yahoo Finance"},
     # CNBC business and markets sections
-    {"url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",  "section": "business", "name": "CNBC Business"},
-    {"url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "section": "markets",  "name": "CNBC Markets"},
-    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",  "section": "world",    "name": "CNBC World"},
-    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",  "section": "tech",     "name": "CNBC Technology"},
+    {"url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",              "section": "business", "name": "CNBC Business"},
+    {"url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",             "section": "markets",  "name": "CNBC Markets"},
+    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",              "section": "world",    "name": "CNBC World"},
+    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",              "section": "tech",     "name": "CNBC Technology"},
+    # CNN business and technology
+    {"url": "https://rss.cnn.com/rss/money_news_international.rss",              "section": "business", "name": "CNN Business"},
+    {"url": "https://rss.cnn.com/rss/cnn_tech.rss",                              "section": "tech",     "name": "CNN Tech"},
+    # The Economist — finance and business sections
+    {"url": "https://www.economist.com/finance-and-economics/rss.xml",           "section": "markets",  "name": "The Economist Finance"},
+    {"url": "https://www.economist.com/business/rss.xml",                        "section": "business", "name": "The Economist Business"},
 ]
 
 # CSS selector cascade for WSJ article body (used by both requests and Playwright paths)

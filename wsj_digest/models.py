@@ -66,6 +66,10 @@ class Article:
             return "Yahoo Finance"
         if "cnbc" in feed:
             return "CNBC"
+        if "economist" in feed:
+            return "The Economist"
+        if "cnn" in feed:
+            return "CNN"
         if "wsj" in feed or "wall street" in feed:
             return "WSJ"
         if "investor" in feed or "ibd" in feed:
