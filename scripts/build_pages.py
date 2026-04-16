@@ -26,7 +26,7 @@ _INDEX_TEMPLATE = """\
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>WSJ Daily Digest — Archive</title>
+  <title>Daily Financial Digest — Archive</title>
   <style>
     :root {{
       --navy:   #003366;
@@ -175,10 +175,12 @@ _INDEX_TEMPLATE = """\
 <body>
 
   <header class="site-header">
-    <h1>WSJ Daily Digest</h1>
-    <p class="tagline">Curated Wall Street Journal highlights — Global · Market · Stock · Tech</p>
+    <h1>Daily Financial Digest</h1>
+    <p class="tagline">Financial · Market · Stock · Tech · AI · Portfolio — updated every day at 14:00 台灣時間</p>
     <p class="updated">Updated: {updated}</p>
   </header>
+
+  {fixed_link_section}
 
   {featured_section}
 
@@ -191,6 +193,14 @@ _INDEX_TEMPLATE = """\
 
 </body>
 </html>
+"""
+
+_FIXED_LINK_SECTION = """\
+  <p class="section-title">Fixed Permalink — always today&#39;s digest</p>
+  <div style="background:#f0f4f8;border:1px solid var(--border);border-radius:4px;padding:0.9rem 1.2rem;margin-bottom:2rem;font-family:Arial,sans-serif;font-size:0.88rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+    <span style="color:var(--muted);">Bookmark this URL — it updates every day automatically:</span>
+    <a href="reports/latest.html" style="font-weight:700;color:var(--navy);word-break:break-all;">&#128279; /reports/latest.html</a>
+  </div>
 """
 
 _FEATURED_SECTION = """\
@@ -263,18 +273,27 @@ def build_index(docs_dir: Path, repo: str = "cpillow677-hub/WSJreadnews") -> Pat
     updated = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
 
     if not entries:
+        fixed_link_section = ""
         featured_section = '  <div class="empty">No reports yet — the first digest will appear after the next scheduled run.</div>\n'
         archive_section = ""
     else:
         # Featured = newest
         latest_dt, latest_path = entries[0]
+
+        # Copy newest report → latest.html (fixed permalink)
+        latest_dest = reports_dir / "latest.html"
+        import shutil
+        shutil.copy2(latest_path, latest_dest)
+        print(f"[build_pages] latest.html → {latest_dest} (copy of {latest_path.name})")
+
+        fixed_link_section = _FIXED_LINK_SECTION
         featured_section = _FEATURED_SECTION.format(
             filename=latest_path.name,
             date_display=_fmt_date(latest_dt),
             weekday=_fmt_weekday(latest_dt),
         )
 
-        # Archive = all reports (including newest, for completeness)
+        # Archive = all dated reports (latest.html excluded)
         archive_section = _ARCHIVE_SECTION_OPEN.format(count=len(entries))
         for dt, fp in entries:
             archive_section += _ARCHIVE_CARD.format(
@@ -286,6 +305,7 @@ def build_index(docs_dir: Path, repo: str = "cpillow677-hub/WSJreadnews") -> Pat
 
     html = _INDEX_TEMPLATE.format(
         updated=updated,
+        fixed_link_section=fixed_link_section,
         featured_section=featured_section,
         archive_section=archive_section,
         repo=repo,
