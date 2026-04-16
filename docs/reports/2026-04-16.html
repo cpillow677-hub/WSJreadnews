@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WSJ Digest &ndash; 2026-04-16</title>
+  <style>
+    :root {
+      --navy:   #003366;
+      --red:    #b30000;
+      --bg:     #f5f5f0;
+      --card:   #ffffff;
+      --text:   #1a1a1a;
+      --muted:  #666666;
+      --border: #dddddd;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+      line-height: 1.6;
+    }
+    /* ---- Header ---- */
+    header {
+      border-bottom: 4px double var(--red);
+      padding-bottom: 1rem;
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .digest-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+    /* ---- Nav pills ---- */
+    .category-nav {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 2.5rem;
+    }
+    .category-nav a {
+      background: var(--navy);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-family: Arial, sans-serif;
+    }
+    .category-nav a:hover { background: var(--red); }
+    /* ---- Category section ---- */
+    .category-section { margin-bottom: 3rem; }
+    .category-header {
+      font-size: 1.45rem;
+      color: var(--navy);
+      border-left: 5px solid var(--red);
+      padding-left: 0.65rem;
+      margin-bottom: 0.3rem;
+    }
+    .category-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 1.2rem;
+      padding-left: 0.9rem;
+    }
+    /* ---- Article card ---- */
+    .article-card {
+      background: var(--card);
+      border-left: 4px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.3rem;
+    }
+    .article-title {
+      font-size: 1.08rem;
+      font-weight: bold;
+      color: var(--navy);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .article-title:hover { text-decoration: underline; color: var(--red); }
+    .article-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-bottom: 0.7rem;
+    }
+    .source-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      margin-right: 0.4rem;
+      vertical-align: middle;
+      letter-spacing: 0.3px;
+    }
+    .source-yahoo  { background: #6001d2; color: #fff; }
+    .source-cnbc   { background: #c00; color: #fff; }
+    .source-wsj    { background: #003366; color: #fff; }
+    .source-ibd    { background: #e06000; color: #fff; }
+    .source-other  { background: #555; color: #fff; }
+    .score-badge {
+      display: inline-block;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.7rem;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      margin-left: 0.4rem;
+      vertical-align: middle;
+      font-family: Arial, sans-serif;
+    }
+    .summary {
+      font-size: 0.93rem;
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+    .why-matters {
+      background: #f0f4f8;
+      border-radius: 5px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.87rem;
+    }
+    .why-matters strong {
+      color: var(--navy);
+      font-family: Arial, sans-serif;
+    }
+    .why-matters ul {
+      margin: 0.3rem 0 0 1.2rem;
+      padding: 0;
+    }
+    .why-matters li { margin-bottom: 0.2rem; }
+    /* ---- Shortfall notice ---- */
+    .shortfall-notice {
+      color: var(--red);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px dashed var(--red);
+      border-radius: 4px;
+    }
+    /* ---- Footer ---- */
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+    footer p { margin-bottom: 0.3rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Daily Financial Digest</h1>
+  <p class="digest-meta">
+    Thursday, April 16, 2026 &nbsp;&bull;&nbsp;
+    13 stories across 7 categories &nbsp;&bull;&nbsp;
+    Generated 2026-04-16 01:50 UTC
+  </p>
+</header>
+
+<nav class="category-nav">
+  
+  <a href="#global">🌍 Global</a>
+  
+  <a href="#market">📈 Market</a>
+  
+  <a href="#stock">🏢 Stock</a>
+  
+  <a href="#tech">💻 Tech</a>
+  
+  <a href="#ai_apps">🤖 AI_Apps</a>
+  
+  <a href="#industry_academia">🏭 Industry_Academia</a>
+  
+  <a href="#portfolio">⭐ Portfolio</a>
+  
+</nav>
+
+
+<section class="category-section" id="global">
+  <h2 class="category-header">🌍 Global</h2>
+  <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
+
+  
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/sectors/technology/article/why-starlink-is-so-important-to-spacexs-ipo-174446711.html" target="_blank" rel="noopener noreferrer">
+        Why Starlink is so important to SpaceX&#39;s IPO
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;45.6</span>
+      </div>
+      <p class="summary">Why Starlink is so important to SpaceX&#39;s IPO. . The public offering will test investor appetite and provide a market valuation benchmark for comparable private-sector peers. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+          
+          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/news/imf-warns-middle-east-war-142141366.html" target="_blank" rel="noopener noreferrer">
+        IMF warns Middle East war driving up financial stability risks
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;41.3</span>
+      </div>
+      <p class="summary">IMF warns Middle East war driving up financial stability risks. . The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Shapes the geopolitical backdrop for Middle East and could influence trade flows and currency markets.</li>
+          
+          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.barrons.com/articles/imf-global-financial-stability-risks-middle-east-war-markets-23bde1a6" target="_blank" rel="noopener noreferrer">
+        Global Financial Stability Risks Are Rising as Middle East War Persists, IMF Warns
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;41.3</span>
+      </div>
+      <p class="summary">Global Financial Stability Risks Are Rising as Middle East War Persists, IMF Warns. . The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Shapes the geopolitical backdrop for Middle East and could influence trade flows and currency markets.</li>
+          
+          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+  
+</section>
+
+<section class="category-section" id="market">
+  <h2 class="category-header">📈 Market</h2>
+  <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
+
+  
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/markets/currencies/articles/dollar-retreats-us-iran-peace-143449336.html" target="_blank" rel="noopener noreferrer">
+        Dollar Retreats on US-Iran Peace Optimism and Below-Estimate PPI Report
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;42.9</span>
+      </div>
+      <p class="summary">Dollar Retreats on US-Iran Peace Optimism and Below-Estimate PPI Report. . The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+          
+          <li>Traders are repricing dollar exposure in response to the latest macro data.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.cnbc.com/2026/04/15/iran-conflict-oil-prices-cruise-lines.html" target="_blank" rel="noopener noreferrer">
+        For cruise lines, Iran conflict and oil prices threaten to dent profits
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-cnbc">CNBC</span>
+        
+        Apr 15, 2026 21:44 UTC
+        
+        <span class="score-badge">Score&nbsp;41.8</span>
+      </div>
+      <p class="summary">Even as the industry navigates choppy seas, cruise companies are looking for their next avenues for growth. The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+          
+          <li>Traders are repricing oil exposure in response to the latest macro data.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.cnbc.com/2026/04/15/goldman-sachs-bond-traders-wall-street-rivals.html" target="_blank" rel="noopener noreferrer">
+        Goldman Sachs bond traders stumbled as Wall Street rivals thrived: &#39;A fire is being lit under&#39; them
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-cnbc">CNBC</span>
+        
+        Apr 15, 2026 21:31 UTC
+        
+        <span class="score-badge">Score&nbsp;41.4</span>
+      </div>
+      <p class="summary">Goldman&#39;s identity as a trader&#39;s firm — one expected to perform in turbulent markets — makes any stumble in the division notable. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+          
+          <li>Traders are repricing gold exposure in response to the latest macro data.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+  
+</section>
+
+<section class="category-section" id="stock">
+  <h2 class="category-header">🏢 Stock</h2>
+  <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
+
+  
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/markets/stocks/articles/netflix-q1-earnings-preview-investors-135858338.html" target="_blank" rel="noopener noreferrer">
+        Netflix Q1 Earnings Preview: What Investors Should Expect on April 16
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;47.4</span>
+      </div>
+      <p class="summary">Netflix Q1 Earnings Preview: What Investors Should Expect on April 16. . The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Netflix shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+          
+          <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.cnbc.com/2026/04/15/asml-q1-2026-earnings-report.html" target="_blank" rel="noopener noreferrer">
+        ASML stock sinks amid tightening China restrictions despite strong earnings, guidance
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-cnbc">CNBC</span>
+        
+        Apr 15, 2026 17:37 UTC
+        
+        <span class="score-badge">Score&nbsp;46.2</span>
+      </div>
+      <p class="summary">Chip giant ASML saw a 5% drop Wednesday amid tightening export restrictions on sales to China, despite beating expectations and raising 2026 sales guidance. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>The company shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+          
+          <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/markets/stocks/articles/hp-stock-pops-nvidia-acquisition-135253637.html" target="_blank" rel="noopener noreferrer">
+        HP Stock Pops on Nvidia Acquisition Rumors. Should You Buy HPQ Stock Today?
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;44.7</span>
+      </div>
+      <p class="summary">HP Stock Pops on Nvidia Acquisition Rumors. Should You Buy HPQ Stock Today?. . The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>The company shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+          
+          <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+  
+</section>
+
+<section class="category-section" id="tech">
+  <h2 class="category-header">💻 Tech</h2>
+  <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
+
+  
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.cnbc.com/2026/04/15/public-opinion-ai-data-centers-anthropic-openai-ipo.html" target="_blank" rel="noopener noreferrer">
+        The public sours on AI and data centers as Anthropic, OpenAI look to IPO and tech keeps spending
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-cnbc">CNBC</span>
+        
+        Apr 15, 2026 23:58 UTC
+        
+        <span class="score-badge">Score&nbsp;69.9</span>
+      </div>
+      <p class="summary">Negativity around AI could be a drag on OpenAI and Anthropic as the startups look to go public, and will likely be a major issue in the midterm elections. The public offering will test investor appetite and provide a market valuation benchmark for comparable private-sector peers. The story originated from the WSJ markets section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+          
+          <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/markets/stocks/articles/unity-software-stock-buy-sell-135718376.html" target="_blank" rel="noopener noreferrer">
+        Is Unity Software Stock a Buy, Sell, or Hold on VR Partnership with Meta Platforms?
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;49.4</span>
+      </div>
+      <p class="summary">Is Unity Software Stock a Buy, Sell, or Hold on VR Partnership with Meta Platforms?. . The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Signals a potential shift in the competitive landscape for software, with ramifications for adjacent platforms.</li>
+          
+          <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+    <div class="article-card">
+      <a class="article-title" href="https://finance.yahoo.com/markets/stocks/articles/susquehanna-raises-intel-price-target-141843785.html" target="_blank" rel="noopener noreferrer">
+        Susquehanna Raises Intel’s Price Target to $65: Is the Struggling Chipmaker Finally Turning the Corner?
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-yahoo">Yahoo Finance</span>
+        
+        Apr 16, 2026 01:50 UTC
+        
+        <span class="score-badge">Score&nbsp;41.3</span>
+      </div>
+      <p class="summary">Susquehanna Raises Intel’s Price Target to $65: Is the Struggling Chipmaker Finally Turning the Corner?. . Revised analyst recommendations typically trigger institutional rebalancing and can amplify near-term price moves in the underlying security. The story originated from the WSJ top section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+          
+          <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+  
+</section>
+
+<section class="category-section" id="ai_apps">
+  <h2 class="category-header">🤖 AI_Apps</h2>
+  <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
+
+  
+    
+    <div class="article-card">
+      <a class="article-title" href="https://www.cnbc.com/2026/04/15/anthropic-outage-elevated-errors-claude-chatbot-code-api.html" target="_blank" rel="noopener noreferrer">
+        Anthropic products are operational after brief outage, status page says
+      </a>
+      <div class="article-meta">
+        
+        <span class="source-badge source-cnbc">CNBC</span>
+        
+        Apr 15, 2026 17:57 UTC
+        
+        <span class="score-badge">Score&nbsp;27.3</span>
+      </div>
+      <p class="summary">Anthropic said it is working to &#34;fully resolve this issue,&#34; according to its page showing the status of the Claude chatbot, Claude Code and the API. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ markets section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+      <div class="why-matters">
+        <strong>Why it matters:</strong>
+        <ul>
+          
+          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+          
+          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+          
+        </ul>
+      </div>
+    </div>
+    
+  
+</section>
+
+<section class="category-section" id="industry_academia">
+  <h2 class="category-header">🏭 Industry_Academia</h2>
+  <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
+
+  
+    <div class="shortfall-notice">
+      No articles found for this category today. Check logs for SHORTFALL details.
+    </div>
+  
+</section>
+
+<section class="category-section" id="portfolio">
+  <h2 class="category-header">⭐ Portfolio</h2>
+  <p class="category-desc">Your personal watchlist — add stock tickers and company names below</p>
+
+  
+    <div class="shortfall-notice">
+      No articles found for this category today. Check logs for SHORTFALL details.
+    </div>
+  
+</section>
+
+
+<footer>
+  <p>Generated 2026-04-16 01:50 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; Wall Street Journal</p>
+  <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
+</footer>
+
+</body>
+</html>
