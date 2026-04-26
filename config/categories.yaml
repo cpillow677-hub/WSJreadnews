@@ -271,30 +271,51 @@ categories:
     target_count: 3
 
   Portfolio:
-    description: "Personal watchlist: IonQ (IONQ) · Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO)"
+    description: "Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)"
     keywords:
       primary:
-        - IonQ
         - Oracle
-        - Broadcom
-        - "Quantum Computing"
-        - IONQ
         - ORCL
+        - "Quantum Computing"
         - QUBT
+        - Broadcom
         - AVGO
+        - Eaton
+        - ETN
+        - Honeywell
+        - HON
+        - Corning
+        - GLW
+        - "AXT Inc"
+        - AXTI
+        - Quantinuum
       secondary:
-        - quantum computer
-        - quantum hardware
-        - trapped ion
         - cloud database
         - enterprise software
         - ERP
-        - semiconductor supply
+        - cloud infrastructure
+        - quantum computer
+        - quantum hardware
+        - qubit
         - networking chip
         - AI chip
         - custom silicon
+        - semiconductor supply
+        - power management
+        - electrical grid
+        - EV charging
+        - data center power
+        - industrial automation
+        - aerospace systems
+        - fiber optic
+        - display glass
+        - Gorilla Glass
+        - compound semiconductor
+        - GaAs
+        - InP
+        - substrate wafer
     wsj_sections: []
-    target_count: 3
+    target_count: 4
 
 # ------------------------------------------------------------------ #
 # Global pipeline settings                                            #

@@ -78,6 +78,10 @@ class Article:
             return "Reuters"
         if "bloomberg" in feed:
             return "Bloomberg"
+        if "techcrunch" in feed:
+            return "TechCrunch"
+        if "marketwatch" in feed:
+            return "MarketWatch"
         return self.source_feed
 
     def to_dict(self) -> dict:

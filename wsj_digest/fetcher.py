@@ -77,6 +77,15 @@ DEFAULT_RSS_FEEDS = [
     # The Economist — finance and business sections
     {"url": "https://www.economist.com/finance-and-economics/rss.xml",           "section": "markets",  "name": "The Economist Finance"},
     {"url": "https://www.economist.com/business/rss.xml",                        "section": "business", "name": "The Economist Business"},
+    # TechCrunch — startup, AI, and tech industry news
+    {"url": "https://techcrunch.com/feed/",                                       "section": "tech",     "name": "TechCrunch"},
+    {"url": "https://techcrunch.com/category/artificial-intelligence/feed/",      "section": "tech",     "name": "TechCrunch AI"},
+    # MarketWatch — stock market and individual company news (Seeking Alpha alternative)
+    {"url": "https://feeds.marketwatch.com/marketwatch/topstories/",              "section": "markets",  "name": "MarketWatch"},
+    {"url": "https://feeds.marketwatch.com/marketwatch/marketpulse/",             "section": "markets",  "name": "MarketWatch Pulse"},
+    # Reuters — global business and financial news
+    {"url": "https://feeds.reuters.com/reuters/businessNews",                     "section": "business", "name": "Reuters Business"},
+    {"url": "https://feeds.reuters.com/reuters/technologyNews",                   "section": "tech",     "name": "Reuters Technology"},
 ]
 
 # CSS selector cascade for WSJ article body (used by both requests and Playwright paths)

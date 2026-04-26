@@ -132,13 +132,16 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
       vertical-align: middle;
       letter-spacing: 0.3px;
     }
-    .source-yahoo      { background: #6001d2; color: #fff; }
-    .source-cnbc       { background: #c00;    color: #fff; }
-    .source-wsj        { background: #003366; color: #fff; }
-    .source-economist  { background: #e3120b; color: #fff; }
-    .source-cnn        { background: #cc0000; color: #fff; }
-    .source-ibd        { background: #e06000; color: #fff; }
-    .source-other      { background: #555;    color: #fff; }
+    .source-yahoo       { background: #6001d2; color: #fff; }
+    .source-cnbc        { background: #c00;    color: #fff; }
+    .source-wsj         { background: #003366; color: #fff; }
+    .source-economist   { background: #e3120b; color: #fff; }
+    .source-cnn         { background: #cc0000; color: #fff; }
+    .source-ibd         { background: #e06000; color: #fff; }
+    .source-techcrunch  { background: #0a7d3e; color: #fff; }
+    .source-marketwatch { background: #004b87; color: #fff; }
+    .source-reuters     { background: #ff8000; color: #fff; }
+    .source-other       { background: #555;    color: #fff; }
     .score-badge {
       display: inline-block;
       background: var(--navy);
@@ -227,6 +230,9 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
         {% elif "CNN" in sl %}<span class="source-badge source-cnn">{{ sl }}</span>
         {% elif "WSJ" in sl %}<span class="source-badge source-wsj">{{ sl }}</span>
         {% elif "Investor" in sl %}<span class="source-badge source-ibd">{{ sl }}</span>
+        {% elif "TechCrunch" in sl %}<span class="source-badge source-techcrunch">{{ sl }}</span>
+        {% elif "MarketWatch" in sl %}<span class="source-badge source-marketwatch">{{ sl }}</span>
+        {% elif "Reuters" in sl %}<span class="source-badge source-reuters">{{ sl }}</span>
         {% else %}<span class="source-badge source-other">{{ sl }}</span>{% endif %}
         {{ article.publish_time_human }}
         {% if article.author %}&bull; {{ article.author }}{% endif %}
@@ -252,7 +258,7 @@ _HTML_TEMPLATE = """<!DOCTYPE html>
 {% endfor %}
 
 <footer>
-  <p>Generated {{ generated_at }} UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; Wall Street Journal</p>
+  <p>Generated {{ generated_at }} UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
   <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
 </footer>
 
