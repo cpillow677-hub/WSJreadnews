@@ -47,6 +47,95 @@ logger = logging.getLogger(__name__)
 
 
 # ------------------------------------------------------------------ #
+# User settings loader (from webapp's config/user_settings.json)       #
+# ------------------------------------------------------------------ #
+
+def load_user_settings(config_path: Path) -> dict:
+    """
+    Load user overrides. Priority:
+    1. WEBAPP_URL env var → fetch live settings from the Render webapp API
+    2. config/user_settings.json → local fallback
+    3. Empty dict → use pipeline defaults
+    """
+    import json
+
+    # --- Priority 1: fetch from live webapp ---
+    webapp_url = os.environ.get("WEBAPP_URL", "").rstrip("/")
+    if webapp_url:
+        import requests as req
+        import time as _time
+        waits = [15, 30, 45]  # Render free tier can take 30-60s to wake from sleep
+        for attempt, wait in enumerate(waits, 1):
+            try:
+                resp = req.get(f"{webapp_url}/api/settings", timeout=20)
+                if resp.ok:
+                    data = resp.json()
+                    logger.info(
+                        "User settings fetched from webapp: language=%s, tickers=%s",
+                        data.get("language", "en"),
+                        data.get("portfolio_tickers", []),
+                    )
+                    return data
+            except Exception as exc:
+                logger.warning(
+                    "Webapp fetch attempt %d/3 failed (%s) — retrying in %ds",
+                    attempt, exc, wait,
+                )
+                _time.sleep(wait)
+        logger.warning("All webapp fetch attempts failed — falling back to local file")
+
+    # --- Priority 2: local file ---
+    settings_path = config_path.parent / "user_settings.json"
+    if settings_path.exists():
+        try:
+            with settings_path.open(encoding="utf-8") as f:
+                data = json.load(f)
+            logger.info(
+                "User settings loaded from file: language=%s, tickers=%s",
+                data.get("language", "en"),
+                data.get("portfolio_tickers", []),
+            )
+            return data
+        except Exception as exc:
+            logger.warning("Could not read user_settings.json: %s", exc)
+
+    return {}
+
+
+_YF_TICKER_RSS = "https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&region=US&lang=en-US"
+
+
+def apply_user_settings(config: dict, user_settings: dict) -> None:
+    """
+    Override Portfolio keywords with user's tickers and apply language setting.
+    Mutates config in place.
+    Also injects per-ticker Yahoo Finance RSS feeds so small-cap stocks get
+    dedicated coverage even when broad feeds miss them.
+    """
+    tickers = user_settings.get("portfolio_tickers", [])
+    if tickers and "Portfolio" in config.get("categories", {}):
+        portfolio = config["categories"]["Portfolio"]
+        portfolio["keywords"]["primary"] = tickers
+        # Inject a per-ticker Yahoo Finance RSS feed for every ticker so that
+        # small-cap stocks (e.g. QUBT, AXTI) get dedicated article coverage.
+        existing_feeds = portfolio.setdefault("rss_feeds", [])
+        existing_urls = {f["url"] for f in existing_feeds}
+        added = []
+        for ticker in tickers:
+            url = _YF_TICKER_RSS.format(ticker=ticker)
+            if url not in existing_urls:
+                existing_feeds.append({"url": url, "name": f"Yahoo Finance {ticker}"})
+                existing_urls.add(url)
+                added.append(ticker)
+        logger.info(
+            "Portfolio keywords updated from user settings: %s (per-ticker RSS added: %s)",
+            tickers,
+            added or "none new",
+        )
+
+
+
+# ------------------------------------------------------------------ #
 # Config loading and validation                                         #
 # ------------------------------------------------------------------ #
 

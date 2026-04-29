@@ -63,20 +63,59 @@ SECTION_URLS = {
 }
 
 # Current financial news RSS feeds (feeds.a.dj.com was frozen at 2025-01-27)
+# CNN rss.cnn.com deprecated (SSLEOFError); feeds.reuters.com deprecated (DNS failure) — replaced below
 DEFAULT_RSS_FEEDS = [
     # Yahoo Finance — broad financial/market/tech/world news, updated in real-time
-    {"url": "https://finance.yahoo.com/news/rssindex",                            "section": "top",      "name": "Yahoo Finance"},
-    # CNBC business and markets sections
-    {"url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",              "section": "business", "name": "CNBC Business"},
-    {"url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",             "section": "markets",  "name": "CNBC Markets"},
-    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",              "section": "world",    "name": "CNBC World"},
-    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",              "section": "tech",     "name": "CNBC Technology"},
-    # CNN business and technology
-    {"url": "https://rss.cnn.com/rss/money_news_international.rss",              "section": "business", "name": "CNN Business"},
-    {"url": "https://rss.cnn.com/rss/cnn_tech.rss",                              "section": "tech",     "name": "CNN Tech"},
+    {"url": "https://finance.yahoo.com/news/rssindex",                                        "section": "top",      "name": "Yahoo Finance"},
+    # CNBC business, markets, world, and technology
+    {"url": "https://www.cnbc.com/id/10001147/device/rss/rss.html",                          "section": "business", "name": "CNBC Business"},
+    {"url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",                         "section": "markets",  "name": "CNBC Markets"},
+    {"url": "https://www.cnbc.com/id/19854910/device/rss/rss.html",                          "section": "world",    "name": "CNBC World"},
+    {"url": "https://www.cnbc.com/id/15839069/device/rss/rss.html",                          "section": "tech",     "name": "CNBC Technology"},
+    # BBC News — reliable replacement for defunct CNN RSS feeds
+    {"url": "https://feeds.bbci.co.uk/news/business/rss.xml",                                "section": "business", "name": "BBC Business"},
+    {"url": "https://feeds.bbci.co.uk/news/technology/rss.xml",                              "section": "tech",     "name": "BBC Technology"},
+    {"url": "https://feeds.bbci.co.uk/news/world/rss.xml",                                   "section": "world",    "name": "BBC World"},
+    # The Guardian — replacement for defunct Reuters feeds
+    {"url": "https://www.theguardian.com/business/rss",                                       "section": "business", "name": "The Guardian Business"},
+    {"url": "https://www.theguardian.com/technology/rss",                                     "section": "tech",     "name": "The Guardian Technology"},
+    {"url": "https://www.theguardian.com/world/rss",                                          "section": "world",    "name": "The Guardian World"},
     # The Economist — finance and business sections
-    {"url": "https://www.economist.com/finance-and-economics/rss.xml",           "section": "markets",  "name": "The Economist Finance"},
-    {"url": "https://www.economist.com/business/rss.xml",                        "section": "business", "name": "The Economist Business"},
+    {"url": "https://www.economist.com/finance-and-economics/rss.xml",                       "section": "markets",  "name": "The Economist Finance"},
+    {"url": "https://www.economist.com/business/rss.xml",                                    "section": "business", "name": "The Economist Business"},
+    # TechCrunch — startup, AI, and tech industry news
+    {"url": "https://techcrunch.com/feed/",                                                   "section": "tech",     "name": "TechCrunch"},
+    {"url": "https://techcrunch.com/category/artificial-intelligence/feed/",                  "section": "tech",     "name": "TechCrunch AI"},
+    # Ars Technica — in-depth technology and science
+    {"url": "https://feeds.arstechnica.com/arstechnica/index",                                "section": "tech",     "name": "Ars Technica"},
+    {"url": "https://feeds.arstechnica.com/arstechnica/technology-lab",                       "section": "tech",     "name": "Ars Technica Tech Lab"},
+    # The Verge — consumer tech and industry news
+    {"url": "https://www.theverge.com/rss/index.xml",                                         "section": "tech",     "name": "The Verge"},
+    # VentureBeat — AI, enterprise tech, and startup funding
+    {"url": "https://venturebeat.com/feed/",                                                   "section": "tech",     "name": "VentureBeat"},
+    {"url": "https://venturebeat.com/category/ai/feed/",                                       "section": "tech",     "name": "VentureBeat AI"},
+    # Wired — technology and culture
+    {"url": "https://www.wired.com/feed/rss",                                                  "section": "tech",     "name": "Wired"},
+    # MIT Technology Review — research breakthroughs and industry shifts
+    {"url": "https://www.technologyreview.com/feed/",                                          "section": "tech",     "name": "MIT Technology Review"},
+    # IEEE Spectrum — engineering, semiconductors, and applied research
+    {"url": "https://spectrum.ieee.org/feeds/feed.rss",                                        "section": "tech",     "name": "IEEE Spectrum"},
+    # MarketWatch — stock market and individual company news
+    {"url": "https://feeds.marketwatch.com/marketwatch/topstories/",                           "section": "markets",  "name": "MarketWatch"},
+    {"url": "https://feeds.marketwatch.com/marketwatch/marketpulse/",                          "section": "markets",  "name": "MarketWatch Pulse"},
+    # Fortune — global business, Fortune 500, executive news
+    {"url": "https://fortune.com/feed/",                                                        "section": "business", "name": "Fortune"},
+    # Fast Company — business innovation and workplace news
+    {"url": "https://www.fastcompany.com/latest/rss",                                           "section": "business", "name": "Fast Company"},
+    # Business Insider — markets, tech companies, and economy
+    {"url": "https://feeds.businessinsider.com/custom/all",                                     "section": "business", "name": "Business Insider"},
+    # Investopedia — financial news and market analysis
+    {"url": "https://www.investopedia.com/feedbuilder/feed/getfeed?feedName=rss_articles",     "section": "markets",  "name": "Investopedia"},
+    # NPR Business — economy, labor market, and corporate news
+    {"url": "https://feeds.npr.org/1006/rss.xml",                                               "section": "business", "name": "NPR Business"},
+    # AP News — breaking global and financial news
+    {"url": "https://apnews.com/rss/business",                                                  "section": "business", "name": "AP Business"},
+    {"url": "https://apnews.com/rss/technology",                                                "section": "tech",     "name": "AP Technology"},
 ]
 
 # CSS selector cascade for WSJ article body (used by both requests and Playwright paths)
