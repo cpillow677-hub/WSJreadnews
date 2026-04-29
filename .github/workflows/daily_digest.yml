@@ -66,13 +66,24 @@ jobs:
       # 4. Wake up webapp + run pipeline                                   #
       # ---------------------------------------------------------------- #
       - name: Wake up webapp (Render free tier)
-        if: env.WEBAPP_URL != ''
+        continue-on-error: true
         env:
           WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
         run: |
-          echo "Pinging $WEBAPP_URL to wake from sleep..."
-          curl -sf --retry 6 --retry-delay 10 --retry-all-errors \
-            --max-time 90 "$WEBAPP_URL/api/settings" > /dev/null && echo "Webapp ready." || echo "Webapp ping failed — pipeline will retry."
+          if [ -z "$WEBAPP_URL" ]; then
+            echo "WEBAPP_URL not configured — skipping wake-up."
+            exit 0
+          fi
+          echo "Waking up $WEBAPP_URL ..."
+          for i in 1 2 3 4 5 6; do
+            if curl -sf --max-time 20 "$WEBAPP_URL/api/settings" > /dev/null; then
+              echo "Webapp is ready (attempt $i)."
+              exit 0
+            fi
+            echo "Attempt $i failed, waiting 15s..."
+            sleep 15
+          done
+          echo "Webapp did not respond — pipeline will fall back to local settings."
 
       - name: Run digest pipeline
         env:

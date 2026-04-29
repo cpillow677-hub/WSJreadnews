@@ -64,9 +64,11 @@ def load_user_settings(config_path: Path) -> dict:
     webapp_url = os.environ.get("WEBAPP_URL", "").rstrip("/")
     if webapp_url:
         import requests as req
-        for attempt in range(3):
+        import time as _time
+        waits = [15, 30, 45]  # Render free tier can take 30-60s to wake from sleep
+        for attempt, wait in enumerate(waits, 1):
             try:
-                resp = req.get(f"{webapp_url}/api/settings", timeout=15)
+                resp = req.get(f"{webapp_url}/api/settings", timeout=20)
                 if resp.ok:
                     data = resp.json()
                     logger.info(
@@ -76,12 +78,10 @@ def load_user_settings(config_path: Path) -> dict:
                     )
                     return data
             except Exception as exc:
-                wait = 2 ** attempt
                 logger.warning(
                     "Webapp fetch attempt %d/3 failed (%s) — retrying in %ds",
-                    attempt + 1, exc, wait,
+                    attempt, exc, wait,
                 )
-                import time as _time
                 _time.sleep(wait)
         logger.warning("All webapp fetch attempts failed — falling back to local file")
 
