@@ -42,8 +42,47 @@ from wsj_digest.scorer import score_articles
 from wsj_digest.selector import select_top_articles
 from wsj_digest.summarizer import summarize_all
 from wsj_digest.renderer import render_html, render_markdown
+from wsj_digest.translator import translate_articles
 
 logger = logging.getLogger(__name__)
+
+
+# ------------------------------------------------------------------ #
+# User settings loader (from webapp's config/user_settings.json)       #
+# ------------------------------------------------------------------ #
+
+def load_user_settings(config_path: Path) -> dict:
+    """
+    Load optional user overrides from config/user_settings.json.
+    Returns empty dict if file missing or malformed.
+    """
+    import json
+    settings_path = config_path.parent / "user_settings.json"
+    if not settings_path.exists():
+        return {}
+    try:
+        with settings_path.open(encoding="utf-8") as f:
+            data = json.load(f)
+        logger.info("User settings loaded: language=%s, tickers=%s",
+                    data.get("language", "en"),
+                    data.get("portfolio_tickers", []))
+        return data
+    except Exception as exc:
+        logger.warning("Could not read user_settings.json: %s", exc)
+        return {}
+
+
+def apply_user_settings(config: dict, user_settings: dict) -> None:
+    """
+    Override Portfolio keywords with user's tickers and apply language setting.
+    Mutates config in place.
+    """
+    tickers = user_settings.get("portfolio_tickers", [])
+    if tickers and "Portfolio" in config.get("categories", {}):
+        portfolio = config["categories"]["Portfolio"]
+        portfolio["keywords"]["primary"] = tickers
+        # Build secondary from company-name lookups if available
+        logger.info("Portfolio keywords updated from user settings: %s", tickers)
 
 
 # ------------------------------------------------------------------ #
@@ -181,6 +220,13 @@ def main(argv: list[str] | None = None) -> int:
         logging.error("Config error: %s", exc)
         return 1
 
+    # --- Load and apply user settings (from webapp) ---
+    user_settings = load_user_settings(args.config)
+    apply_user_settings(config, user_settings)
+    digest_language = user_settings.get("language", "en")
+    if digest_language != "en":
+        logger.info("Output language: %s (translation enabled)", digest_language)
+
     # --- Apply CLI overrides ---
     settings = config.setdefault("settings", {})
     if args.max_age_hours is not None:
@@ -292,6 +338,21 @@ def main(argv: list[str] | None = None) -> int:
         logger.error("Summarization failed: %s", exc, exc_info=True)
         return 1
     logger.info("Step 4/5 complete: summaries generated")
+
+    # ---------------------------------------------------------------- #
+    # Step 4.5: Translate (if language != English)                       #
+    # ---------------------------------------------------------------- #
+    if digest_language != "en":
+        logger.info("-" * 40)
+        logger.info("Step 4.5/5: Translating summaries to '%s'...", digest_language)
+        try:
+            articles_by_category = translate_articles(
+                articles_by_category, digest_language
+            )
+        except Exception as exc:
+            logger.warning(
+                "Translation failed: %s — continuing with English summaries", exc
+            )
 
     # ---------------------------------------------------------------- #
     # Step 5: Render                                                     #
