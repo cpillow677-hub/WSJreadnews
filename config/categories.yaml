@@ -241,33 +241,58 @@ categories:
         - layoffs
         - job cuts
         - laid off
+        - lays off
+        - cut jobs
+        - cutting jobs
         - restructuring
         - workforce reduction
         - downsizing
         - reduction in force
         - mass firing
+        - fired employees
+        - eliminate positions
+        - headcount reduction
         - research breakthrough
         - study finds
         - new research
         - academic paper
         - peer-reviewed
         - scientists discover
+        - researchers found
+        - clinical trial
+        - patent filed
+        - spinoff
+        - spin-off
+        - demerger
+        - divestiture
       secondary:
         - employees
         - workers
-        - cut jobs
-        - eliminate positions
         - university
         - scientists
         - laboratory
         - research
         - discovery
         - innovation
-        - spinoff
         - RIF
+        - redundancies
+        - severance
+        - plant closure
+        - factory closure
+        - offshoring
+        - outsourcing
+        - merger
+        - acquisition
     wsj_sections:
       - business
       - tech
+    rss_feeds:
+      - url: "https://www.technologyreview.com/feed/"
+        name: "MIT Technology Review"
+      - url: "https://spectrum.ieee.org/feeds/feed.rss"
+        name: "IEEE Spectrum"
+      - url: "https://feeds.npr.org/1006/rss.xml"
+        name: "NPR Business"
     target_count: 3
 
   Portfolio:

@@ -103,17 +103,37 @@ def load_user_settings(config_path: Path) -> dict:
     return {}
 
 
+_YF_TICKER_RSS = "https://feeds.finance.yahoo.com/rss/2.0/headline?s={ticker}&region=US&lang=en-US"
+
+
 def apply_user_settings(config: dict, user_settings: dict) -> None:
     """
     Override Portfolio keywords with user's tickers and apply language setting.
     Mutates config in place.
+    Also injects per-ticker Yahoo Finance RSS feeds so small-cap stocks get
+    dedicated coverage even when broad feeds miss them.
     """
     tickers = user_settings.get("portfolio_tickers", [])
     if tickers and "Portfolio" in config.get("categories", {}):
         portfolio = config["categories"]["Portfolio"]
         portfolio["keywords"]["primary"] = tickers
-        # Build secondary from company-name lookups if available
-        logger.info("Portfolio keywords updated from user settings: %s", tickers)
+        # Inject a per-ticker Yahoo Finance RSS feed for every ticker so that
+        # small-cap stocks (e.g. QUBT, AXTI) get dedicated article coverage.
+        existing_feeds = portfolio.setdefault("rss_feeds", [])
+        existing_urls = {f["url"] for f in existing_feeds}
+        added = []
+        for ticker in tickers:
+            url = _YF_TICKER_RSS.format(ticker=ticker)
+            if url not in existing_urls:
+                existing_feeds.append({"url": url, "name": f"Yahoo Finance {ticker}"})
+                existing_urls.add(url)
+                added.append(ticker)
+        logger.info(
+            "Portfolio keywords updated from user settings: %s (per-ticker RSS added: %s)",
+            tickers,
+            added or "none new",
+        )
+
 
 
 # ------------------------------------------------------------------ #

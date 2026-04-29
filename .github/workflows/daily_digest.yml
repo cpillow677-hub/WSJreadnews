@@ -2,8 +2,8 @@ name: Daily Financial Digest
 
 on:
   schedule:
-    # Run daily at 01:00 UTC = 09:00 Taiwan time (UTC+8)
-    - cron: "0 1 * * *"
+    # Run daily at 06:00 UTC = 14:00 Taiwan time (UTC+8)
+    - cron: "0 6 * * *"
 
   # Allow manual runs from the GitHub Actions UI
   workflow_dispatch:
@@ -63,7 +63,7 @@ jobs:
         run: echo "TODAY=$(date -u +%Y-%m-%d)" >> $GITHUB_ENV
 
       # ---------------------------------------------------------------- #
-      # 4. Wake up webapp + run pipeline                                   #
+      # 4. Wake up Render webapp (free tier cold start)                    #
       # ---------------------------------------------------------------- #
       - name: Wake up webapp (Render free tier)
         continue-on-error: true
@@ -85,6 +85,9 @@ jobs:
           done
           echo "Webapp did not respond — pipeline will fall back to local settings."
 
+      # ---------------------------------------------------------------- #
+      # 5. Run digest pipeline                                             #
+      # ---------------------------------------------------------------- #
       - name: Run digest pipeline
         env:
           WSJ_EMAIL:    ${{ secrets.WSJ_EMAIL }}
@@ -96,7 +99,40 @@ jobs:
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
 
       # ---------------------------------------------------------------- #
-      # 5. Upload output files as artifacts (30-day retention)            #
+      # 6. Push generated digest to Render webapp                         #
+      # ---------------------------------------------------------------- #
+      - name: Push digest to Render webapp
+        if: github.event.inputs.dry_run != 'true'
+        continue-on-error: true
+        env:
+          WEBAPP_URL:  ${{ secrets.WEBAPP_URL }}
+          PUSH_TOKEN:  ${{ secrets.PUSH_TOKEN }}
+        run: |
+          if [ -z "$WEBAPP_URL" ] || [ -z "$PUSH_TOKEN" ]; then
+            echo "WEBAPP_URL or PUSH_TOKEN not configured — skipping push to webapp."
+            exit 0
+          fi
+          HTML_FILE="output/daily_digest_${TODAY}.html"
+          if [ ! -f "$HTML_FILE" ]; then
+            echo "No HTML file found at $HTML_FILE — skipping push."
+            exit 0
+          fi
+          echo "Pushing digest to $WEBAPP_URL/api/push-digest ..."
+          HTTP_STATUS=$(curl -s -o /tmp/push_response.txt -w "%{http_code}" \
+            -X POST "$WEBAPP_URL/api/push-digest" \
+            -H "Authorization: Bearer $PUSH_TOKEN" \
+            -H "Content-Type: text/html; charset=utf-8" \
+            --data-binary "@$HTML_FILE" \
+            --max-time 30)
+          echo "Response ($HTTP_STATUS): $(cat /tmp/push_response.txt)"
+          if [ "$HTTP_STATUS" = "200" ]; then
+            echo "Digest pushed to Render webapp successfully."
+          else
+            echo "Push failed with HTTP $HTTP_STATUS — digest is still on GitHub Pages."
+          fi
+
+      # ---------------------------------------------------------------- #
+      # 7. Upload output files as artifacts (30-day retention)            #
       # ---------------------------------------------------------------- #
       - name: Upload digest artifacts
         uses: actions/upload-artifact@v4
@@ -107,13 +143,12 @@ jobs:
           retention-days: 30
 
       # ---------------------------------------------------------------- #
-      # 6. Copy report to docs/ and rebuild Pages index                   #
+      # 8. Copy report to docs/ and rebuild Pages index                   #
       # ---------------------------------------------------------------- #
       - name: Copy report to docs/reports/
         if: github.event.inputs.dry_run != 'true'
         run: |
           mkdir -p docs/reports
-          # Copy the generated HTML report into the Pages directory
           if [ -f "output/daily_digest_$TODAY.html" ]; then
             cp "output/daily_digest_$TODAY.html" "docs/reports/$TODAY.html"
             echo "Copied daily_digest_$TODAY.html → docs/reports/$TODAY.html"
@@ -126,7 +161,7 @@ jobs:
         run: python scripts/build_pages.py
 
       # ---------------------------------------------------------------- #
-      # 7. Commit updated docs/ back to the repository                    #
+      # 9. Commit updated docs/ back to the repository                    #
       # ---------------------------------------------------------------- #
       - name: Commit updated docs/ to repository
         if: github.event.inputs.dry_run != 'true'
@@ -142,7 +177,7 @@ jobs:
           fi
 
       # ---------------------------------------------------------------- #
-      # 8. Deploy docs/ to GitHub Pages                                   #
+      # 10. Deploy docs/ to GitHub Pages                                   #
       # ---------------------------------------------------------------- #
       - name: Setup Pages
         if: github.event.inputs.dry_run != 'true'

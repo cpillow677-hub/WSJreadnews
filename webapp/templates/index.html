@@ -189,7 +189,7 @@
 
 <header>
   <h1>Daily Financial Digest — Settings</h1>
-  <p>Configure your Portfolio watchlist and report language. Changes take effect at the next scheduled run (09:00 台灣時間).</p>
+  <p>Save your settings to generate the digest immediately, or wait for the scheduled run (09:00 台灣時間).</p>
 </header>
 
 {% if updated_at %}
@@ -198,6 +198,25 @@
   {% if github_enabled %}<span class="github-badge">GitHub sync ON</span>{% endif %}
 </div>
 {% endif %}
+
+<!-- Digest status banner -->
+<div class="card" id="digest-card">
+  <h2>📰 Latest Digest</h2>
+  <div id="digest-status-wrap">
+    {% if digest_status == "ready" %}
+      <a href="/digest" id="digest-link" style="display:inline-block;padding:0.5rem 1.2rem;background:var(--navy);color:#fff;text-decoration:none;border-radius:4px;font-family:Arial,sans-serif;font-size:0.9rem;">View Digest →</a>
+      {% if digest_timestamp %}<p class="hint" style="margin-top:0.5rem;">Last generated: {{ digest_timestamp[:16].replace('T',' ') }} UTC</p>{% endif %}
+    {% elif digest_status == "running" %}
+      <p style="font-family:Arial,sans-serif;font-size:0.9rem;color:var(--navy);">⏳ Generating digest… <span id="gen-dots">.</span></p>
+      <p class="hint">Usually takes 1–2 minutes. <a href="/digest" style="color:var(--navy);">Watch progress →</a></p>
+    {% elif digest_status == "error" %}
+      <p style="font-family:Arial,sans-serif;font-size:0.88rem;color:var(--red);">⚠ Last generation failed. Save settings again to retry.</p>
+      <a href="/digest" style="font-size:0.82rem;color:var(--muted);">View error details →</a>
+    {% else %}
+      <p class="hint">No digest yet. Save your settings below to generate one now.</p>
+    {% endif %}
+  </div>
+</div>
 
 <!-- Portfolio -->
 <div class="card">
@@ -291,10 +310,11 @@
       const data = await res.json();
 
       if (res.ok) {
-        let msg = `✓ Saved — ${data.portfolio_tickers.join(', ')} · Language: ${data.language_name}`;
+        let msg = `✓ Saved — generating digest now…`;
         if (data.github_synced) msg += ' · Synced to GitHub ✓';
-        else msg += ' · (Local only — set GITHUB_TOKEN to sync to repo)';
         showToast(msg, true);
+        setDigestStatusUI('running', null);
+        startPolling();
       } else {
         showToast('Error: ' + (data.error || 'Unknown error'), false);
       }
@@ -311,11 +331,58 @@
     t.textContent = msg;
     t.className = ok ? 'ok' : 'error';
     t.style.display = 'block';
-    setTimeout(() => { t.style.display = 'none'; }, 8000);
+    setTimeout(() => { t.style.display = 'none'; }, 10000);
+  }
+
+  // ── Digest status polling ──
+  let _pollTimer = null;
+  let _dotCount = 0;
+
+  function setDigestStatusUI(status, timestamp) {
+    const wrap = document.getElementById('digest-status-wrap');
+    if (!wrap) return;
+    if (status === 'ready') {
+      const ts = timestamp ? timestamp.slice(0,16).replace('T',' ') + ' UTC' : '';
+      wrap.innerHTML = `<a href="/digest" style="display:inline-block;padding:0.5rem 1.2rem;background:var(--navy);color:#fff;text-decoration:none;border-radius:4px;font-family:Arial,sans-serif;font-size:0.9rem;">View Digest →</a>`
+        + (ts ? `<p class="hint" style="margin-top:0.5rem;">Last generated: ${ts}</p>` : '');
+    } else if (status === 'running') {
+      wrap.innerHTML = `<p style="font-family:Arial,sans-serif;font-size:0.9rem;color:var(--navy);">⏳ Generating digest… <span id="gen-dots">.</span></p>`
+        + `<p class="hint">Usually takes 1–2 minutes. <a href="/digest" style="color:var(--navy);">Watch progress →</a></p>`;
+    } else if (status === 'error') {
+      wrap.innerHTML = `<p style="font-family:Arial,sans-serif;font-size:0.88rem;color:var(--red);">⚠ Generation failed. Save settings again to retry.</p>`
+        + `<a href="/digest" style="font-size:0.82rem;color:var(--muted);">View error details →</a>`;
+    }
+  }
+
+  function animateDots() {
+    const el = document.getElementById('gen-dots');
+    if (el) { _dotCount = (_dotCount + 1) % 4; el.textContent = '.'.repeat(_dotCount + 1); }
+  }
+
+  function startPolling() {
+    if (_pollTimer) return;
+    _pollTimer = setInterval(async () => {
+      try {
+        const r = await fetch('/api/digest-status');
+        const d = await r.json();
+        animateDots();
+        if (d.status === 'ready') {
+          clearInterval(_pollTimer); _pollTimer = null;
+          setDigestStatusUI('ready', d.timestamp);
+          showToast('✓ Digest is ready! Click "View Digest" to read.', true);
+        } else if (d.status === 'error') {
+          clearInterval(_pollTimer); _pollTimer = null;
+          setDigestStatusUI('error', d.timestamp);
+        }
+      } catch (_) {}
+    }, 8000);
   }
 
   // ── Init ──
   renderChips();
+  // Auto-start polling if digest is currently generating
+  const INITIAL_STATUS = {{ digest_status | tojson }};
+  if (INITIAL_STATUS === 'running') startPolling();
 </script>
 
 </body>
