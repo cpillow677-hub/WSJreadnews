@@ -63,12 +63,22 @@ jobs:
         run: echo "TODAY=$(date -u +%Y-%m-%d)" >> $GITHUB_ENV
 
       # ---------------------------------------------------------------- #
-      # 4. Run pipeline                                                    #
+      # 4. Wake up webapp + run pipeline                                   #
       # ---------------------------------------------------------------- #
+      - name: Wake up webapp (Render free tier)
+        if: env.WEBAPP_URL != ''
+        env:
+          WEBAPP_URL: ${{ secrets.WEBAPP_URL }}
+        run: |
+          echo "Pinging $WEBAPP_URL to wake from sleep..."
+          curl -sf --retry 6 --retry-delay 10 --retry-all-errors \
+            --max-time 90 "$WEBAPP_URL/api/settings" > /dev/null && echo "Webapp ready." || echo "Webapp ping failed — pipeline will retry."
+
       - name: Run digest pipeline
         env:
           WSJ_EMAIL:    ${{ secrets.WSJ_EMAIL }}
           WSJ_PASSWORD: ${{ secrets.WSJ_PASSWORD }}
+          WEBAPP_URL:   ${{ secrets.WEBAPP_URL }}
         run: |
           python run_digest.py \
             --log-level "${{ github.event.inputs.log_level || 'INFO' }}" \

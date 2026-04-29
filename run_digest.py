@@ -53,23 +53,54 @@ logger = logging.getLogger(__name__)
 
 def load_user_settings(config_path: Path) -> dict:
     """
-    Load optional user overrides from config/user_settings.json.
-    Returns empty dict if file missing or malformed.
+    Load user overrides. Priority:
+    1. WEBAPP_URL env var → fetch live settings from the Render webapp API
+    2. config/user_settings.json → local fallback
+    3. Empty dict → use pipeline defaults
     """
     import json
+
+    # --- Priority 1: fetch from live webapp ---
+    webapp_url = os.environ.get("WEBAPP_URL", "").rstrip("/")
+    if webapp_url:
+        import requests as req
+        for attempt in range(3):
+            try:
+                resp = req.get(f"{webapp_url}/api/settings", timeout=15)
+                if resp.ok:
+                    data = resp.json()
+                    logger.info(
+                        "User settings fetched from webapp: language=%s, tickers=%s",
+                        data.get("language", "en"),
+                        data.get("portfolio_tickers", []),
+                    )
+                    return data
+            except Exception as exc:
+                wait = 2 ** attempt
+                logger.warning(
+                    "Webapp fetch attempt %d/3 failed (%s) — retrying in %ds",
+                    attempt + 1, exc, wait,
+                )
+                import time as _time
+                _time.sleep(wait)
+        logger.warning("All webapp fetch attempts failed — falling back to local file")
+
+    # --- Priority 2: local file ---
     settings_path = config_path.parent / "user_settings.json"
-    if not settings_path.exists():
-        return {}
-    try:
-        with settings_path.open(encoding="utf-8") as f:
-            data = json.load(f)
-        logger.info("User settings loaded: language=%s, tickers=%s",
-                    data.get("language", "en"),
-                    data.get("portfolio_tickers", []))
-        return data
-    except Exception as exc:
-        logger.warning("Could not read user_settings.json: %s", exc)
-        return {}
+    if settings_path.exists():
+        try:
+            with settings_path.open(encoding="utf-8") as f:
+                data = json.load(f)
+            logger.info(
+                "User settings loaded from file: language=%s, tickers=%s",
+                data.get("language", "en"),
+                data.get("portfolio_tickers", []),
+            )
+            return data
+        except Exception as exc:
+            logger.warning("Could not read user_settings.json: %s", exc)
+
+    return {}
 
 
 def apply_user_settings(config: dict, user_settings: dict) -> None:
