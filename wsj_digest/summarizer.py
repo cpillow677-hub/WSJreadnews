@@ -440,3 +440,70 @@ def summarize_all(
             summarize_article(article, category_defs)
         logger.debug("Summarized %d articles in '%s'", len(articles), cat_name)
     return articles_by_category
+
+
+def generate_tldr(articles_by_category: dict[str, list[Article]]) -> str:
+    """
+    Generate a 3-sentence executive TL;DR synthesising the day's top news.
+    Called after summarize_all so article.summary is populated.
+    """
+    all_articles: list[Article] = []
+    for arts in articles_by_category.values():
+        all_articles.extend(arts)
+    if not all_articles:
+        return ""
+
+    all_articles.sort(key=lambda a: a.total_score, reverse=True)
+    top = all_articles[0]
+    total = len(all_articles)
+
+    # --- Sentence 1: lead with the top story ---
+    summary_sents = _split_sentences(top.summary) if top.summary else []
+    if not summary_sents:
+        summary_sents = _split_sentences(_clean_lead(top.lead_text))
+    s1_base = summary_sents[0] if summary_sents else top.title
+    if len(s1_base.split()) < 8:
+        s1_base = top.title
+    sentence1 = s1_base.rstrip(".") + ", headlining today's digest."
+
+    # --- Sentence 2: dominant theme ---
+    type_counts: dict[str, int] = {}
+    for a in all_articles[:min(10, total)]:
+        t = _detect_type(a)
+        type_counts[t] = type_counts.get(t, 0) + 1
+    dominant_type = max(type_counts, key=lambda k: type_counts[k])
+
+    active_cats = [c for c, arts in articles_by_category.items() if arts]
+    cat_span = (
+        ", ".join(active_cats[:2]) if len(active_cats) >= 2 else
+        (active_cats[0] if active_cats else "multiple sectors")
+    )
+    theme_map = {
+        "earnings":     f"Corporate earnings are centre stage, with results shaping near-term outlooks across {cat_span}",
+        "merger":       f"M&A activity is a defining thread, with deal-making spanning {cat_span} categories",
+        "rates":        f"Monetary policy signals are resonating across {cat_span}, with rate moves commanding attention",
+        "geopolitical": f"Geopolitical developments are reverberating through {cat_span}, with broad market implications",
+        "ipo":          f"Capital-markets activity is elevated, with IPO and fundraising news spanning {cat_span}",
+        "downgrade":    f"Analyst revisions are influencing positioning across {cat_span} categories",
+        "layoffs":      f"Workforce restructuring dominates corporate news, with implications across {cat_span}",
+        "default":      f"Markets are navigating a mix of macro and corporate developments spanning {cat_span} and beyond",
+    }
+    sentence2 = theme_map.get(dominant_type, theme_map["default"]) + "."
+
+    # --- Sentence 3: overall sentiment tone ---
+    sentiments = [getattr(a, "sentiment", "Neutral") for a in all_articles]
+    bullish = sentiments.count("Bullish")
+    bearish = sentiments.count("Bearish")
+    if bullish > bearish * 1.4:
+        tone = "optimistic, with bullish signals leading"
+    elif bearish > bullish * 1.4:
+        tone = "cautious, with bearish pressures weighing on sentiment"
+    elif bullish > bearish:
+        tone = "cautiously positive, with a slight constructive lean"
+    elif bearish > bullish:
+        tone = "mixed but leaning cautious, with bearish signals slightly prevalent"
+    else:
+        tone = "balanced, with bullish and bearish signals roughly in equilibrium"
+    sentence3 = f"Across {total} curated stories today, overall tone is {tone}."
+
+    return f"{sentence1} {sentence2} {sentence3}"

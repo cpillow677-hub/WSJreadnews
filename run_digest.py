@@ -40,7 +40,7 @@ load_dotenv()
 from wsj_digest.fetcher import _fetch_all_articles_with_session, enrich_with_full_text
 from wsj_digest.scorer import score_articles
 from wsj_digest.selector import select_top_articles
-from wsj_digest.summarizer import summarize_all
+from wsj_digest.summarizer import summarize_all, generate_tldr
 from wsj_digest.renderer import render_html, render_markdown
 from wsj_digest.translator import translate_articles
 
@@ -134,6 +134,77 @@ def apply_user_settings(config: dict, user_settings: dict) -> None:
             added or "none new",
         )
 
+
+
+# ------------------------------------------------------------------ #
+# Market data snapshot                                                  #
+# ------------------------------------------------------------------ #
+
+_MARKET_SYMBOLS = [
+    ("S&P 500",   "^GSPC"),
+    ("Nasdaq",    "^IXIC"),
+    ("Crude Oil", "CL=F"),
+    ("Gold",      "GC=F"),
+    ("10Y Yield", "^TNX"),
+]
+
+_YF_CHART_URL = "https://query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=1d&range=2d"
+
+
+def fetch_market_data() -> list[dict]:
+    """
+    Fetch key market indices/commodities for the daily snapshot ticker.
+    Returns a list of dicts: {name, price, change_pct, direction}.
+    Returns an empty list on any network or parse failure.
+    """
+    import requests as req
+
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) "
+            "Gecko/20100101 Firefox/120.0"
+        ),
+        "Accept": "application/json",
+    }
+    results = []
+    for name, symbol in _MARKET_SYMBOLS:
+        try:
+            url  = _YF_CHART_URL.format(symbol=symbol)
+            resp = req.get(url, headers=headers, timeout=10)
+            if not resp.ok:
+                logger.debug("Market data HTTP %s for %s", resp.status_code, symbol)
+                continue
+            data  = resp.json()
+            chart = data.get("chart", {}).get("result", [])
+            if not chart:
+                continue
+            meta  = chart[0].get("meta", {})
+            price = float(meta.get("regularMarketPrice") or 0)
+            prev  = float(
+                meta.get("previousClose")
+                or meta.get("chartPreviousClose")
+                or price
+            )
+            change     = price - prev
+            change_pct = (change / prev * 100) if prev else 0.0
+
+            if symbol == "^TNX":
+                price_str = f"{price:.2f}%"
+            elif symbol in ("^GSPC", "^IXIC"):
+                price_str = f"{price:,.2f}"
+            else:
+                price_str = f"${price:,.2f}"
+
+            results.append({
+                "name":       name,
+                "price":      price_str,
+                "change_pct": f"{change_pct:+.2f}%",
+                "direction":  "up" if change >= 0 else "down",
+            })
+        except Exception as exc:
+            logger.debug("Market data fetch skipped for %s: %s", symbol, exc)
+
+    return results
 
 
 # ------------------------------------------------------------------ #
@@ -391,6 +462,21 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Step 4/5 complete: summaries generated")
 
     # ---------------------------------------------------------------- #
+    # Step 4.2: Generate TL;DR                                           #
+    # ---------------------------------------------------------------- #
+    tldr = generate_tldr(articles_by_category)
+    logger.debug("TL;DR generated (%d chars)", len(tldr))
+
+    # ---------------------------------------------------------------- #
+    # Step 4.3: Fetch market-data snapshot for ticker banner             #
+    # ---------------------------------------------------------------- #
+    market_data = fetch_market_data()
+    if market_data:
+        logger.info("Market snapshot fetched: %s", [d["name"] for d in market_data])
+    else:
+        logger.debug("Market snapshot unavailable — ticker will be hidden")
+
+    # ---------------------------------------------------------------- #
     # Step 4.5: Translate (if language != English)                       #
     # ---------------------------------------------------------------- #
     if digest_language != "en":
@@ -418,7 +504,8 @@ def main(argv: list[str] | None = None) -> int:
     else:
         try:
             html_path = render_html(
-                articles_by_category, category_defs, config, output_dir, date_str
+                articles_by_category, category_defs, config, output_dir, date_str,
+                tldr=tldr, market_data=market_data,
             )
             md_path = render_markdown(
                 articles_by_category, category_defs, config, output_dir, date_str

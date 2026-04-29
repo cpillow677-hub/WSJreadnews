@@ -5,30 +5,131 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Daily Financial Digest &ndash; 2026-04-29</title>
   <style>
+    /* ---- CSS variables: light mode ---- */
     :root {
-      --navy:   #003366;
-      --red:    #b30000;
-      --bg:     #f5f5f0;
-      --card:   #ffffff;
-      --text:   #1a1a1a;
-      --muted:  #666666;
-      --border: #dddddd;
+      --navy:      #003366;
+      --red:       #b30000;
+      --bg:        #f5f5f0;
+      --card:      #ffffff;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --border:    #dddddd;
+      --why-bg:    #f0f4f8;
+      --sidebar-bg:#ffffff;
+      --bull-bg:   #e8f5e9; --bull-fg: #2e7d32; --bull-br: #a5d6a7;
+      --bear-bg:   #fce4ec; --bear-fg: #c62828; --bear-br: #ef9a9a;
+      --neut-bg:   #f5f5f5; --neut-fg: #555555; --neut-br: #bdbdbd;
+      --ticker-bg: #eef2f7;
+      --tldr-bg:   #fffbf0;
+      --tldr-br:   #e8a000;
     }
+    /* ---- Dark mode overrides ---- */
+    body.dark-mode {
+      --navy:      #6eaeff;
+      --red:       #ff7b7b;
+      --bg:        #0f1117;
+      --card:      #1a1d27;
+      --text:      #e2e2e2;
+      --muted:     #8a8a9a;
+      --border:    #2a2d3a;
+      --why-bg:    #1e2235;
+      --sidebar-bg:#151720;
+      --bull-bg:   #1b3a22; --bull-fg: #66bb6a; --bull-br: #2e7d32;
+      --bear-bg:   #3a1a22; --bear-fg: #ef5350; --bear-br: #c62828;
+      --neut-bg:   #252535; --neut-fg: #9090a0; --neut-br: #3a3a50;
+      --ticker-bg: #1a1d2e;
+      --tldr-bg:   #1e1a08;
+      --tldr-br:   #8a6a00;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
       font-family: Georgia, 'Times New Roman', serif;
       background: var(--bg);
       color: var(--text);
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem 1.5rem 4rem;
       line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
     }
+
+    /* ---- Dark-mode toggle (fixed) ---- */
+    .dm-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background 0.25s, border-color 0.25s;
+      padding: 0;
+      line-height: 1;
+    }
+    .dm-toggle:hover { opacity: 0.85; }
+
+    /* ---- Two-column page grid ---- */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 860px);
+      gap: 2rem;
+      max-width: 1130px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ---- Sticky sidebar ---- */
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .sidebar-nav {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 0.8rem;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .sidebar-heading {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.4rem;
+    }
+    .sidebar-link {
+      display: block;
+      padding: 0.32rem 0.55rem;
+      margin-bottom: 0.1rem;
+      font-size: 0.82rem;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--border); }
+    .sidebar-link.active { background: var(--navy); color: #fff; }
+
+    /* ---- Main content column ---- */
+    .main-content { min-width: 0; }
+
     /* ---- Header ---- */
     header {
       border-bottom: 4px double var(--red);
       padding-bottom: 1rem;
-      margin-bottom: 2.5rem;
+      margin-bottom: 1.5rem;
     }
     header h1 {
       font-size: 2rem;
@@ -38,25 +139,84 @@
     .digest-meta {
       font-size: 0.88rem;
       color: var(--muted);
+      font-family: Arial, sans-serif;
       margin-top: 0.4rem;
     }
-    /* ---- Nav pills ---- */
-    .category-nav {
+
+    /* ---- Market data ticker banner ---- */
+    .market-ticker {
       display: flex;
-      gap: 0.6rem;
       flex-wrap: wrap;
-      margin-bottom: 2.5rem;
+      align-items: center;
+      gap: 0.3rem 0;
+      background: var(--ticker-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 1.4rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      transition: background 0.25s;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.4rem;
+      white-space: nowrap;
+    }
+    .ticker-name  { color: var(--muted); font-size: 0.74rem; }
+    .ticker-price { font-weight: 700; color: var(--text); }
+    .ticker-change { font-weight: 600; font-size: 0.76rem; }
+    .ticker-item.ticker-up   .ticker-change { color: #2e7d32; }
+    .ticker-item.ticker-down .ticker-change { color: #c62828; }
+    body.dark-mode .ticker-item.ticker-up   .ticker-change { color: #66bb6a; }
+    body.dark-mode .ticker-item.ticker-down .ticker-change { color: #ef5350; }
+    .ticker-sep { color: var(--border); padding: 0 0.25rem; user-select: none; }
+
+    /* ---- TL;DR / Today's Brief ---- */
+    .tldr-section {
+      background: var(--tldr-bg);
+      border-left: 5px solid var(--tldr-br);
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.8rem;
+      transition: background 0.25s;
+    }
+    .tldr-label {
+      font-size: 0.64rem;
+      font-family: Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .tldr-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ---- Mobile top-nav pills (hidden on desktop) ---- */
+    .category-nav {
+      display: none;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
     .category-nav a {
       background: var(--navy);
       color: #fff;
       text-decoration: none;
-      padding: 0.3rem 0.8rem;
+      padding: 0.28rem 0.72rem;
       border-radius: 20px;
-      font-size: 0.82rem;
+      font-size: 0.80rem;
       font-family: Arial, sans-serif;
+      transition: background 0.15s;
     }
     .category-nav a:hover { background: var(--red); }
+
     /* ---- Category section ---- */
     .category-section { margin-bottom: 3rem; }
     .category-header {
@@ -73,7 +233,8 @@
       margin-bottom: 1.2rem;
       padding-left: 0.9rem;
     }
-    /* ---- Article card ---- */
+
+    /* ---- Article card (lazy-reveal via JS) ---- */
     .article-card {
       background: var(--card);
       border-left: 4px solid var(--red);
@@ -81,7 +242,13 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
       padding: 1.1rem 1.4rem;
       margin-bottom: 1.3rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  background 0.25s, box-shadow 0.25s;
     }
+    .article-card.visible { opacity: 1; transform: translateY(0); }
+
     .article-title {
       font-size: 1.08rem;
       font-weight: bold;
@@ -91,12 +258,19 @@
       margin-bottom: 0.25rem;
     }
     .article-title:hover { text-decoration: underline; color: var(--red); }
+
     .article-meta {
       font-size: 0.78rem;
       color: var(--muted);
       font-family: Arial, sans-serif;
       margin-bottom: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
     }
+
+    /* ---- Source badges ---- */
     .source-badge {
       display: inline-block;
       font-size: 0.68rem;
@@ -104,8 +278,6 @@
       font-family: Arial, sans-serif;
       border-radius: 3px;
       padding: 0.1rem 0.4rem;
-      margin-right: 0.4rem;
-      vertical-align: middle;
       letter-spacing: 0.3px;
     }
     .source-yahoo       { background: #6001d2; color: #fff; }
@@ -118,37 +290,58 @@
     .source-marketwatch { background: #004b87; color: #fff; }
     .source-reuters     { background: #ff8000; color: #fff; }
     .source-other       { background: #555;    color: #fff; }
+
+    /* ---- Score badge ---- */
     .score-badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
       background: var(--navy);
       color: #fff;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       border-radius: 10px;
       padding: 0.1rem 0.45rem;
-      margin-left: 0.4rem;
-      vertical-align: middle;
       font-family: Arial, sans-serif;
     }
+
+    /* ---- Sentiment badge ---- */
+    .sentiment-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      border: 1px solid;
+    }
+    .sentiment-bullish { background: var(--bull-bg); color: var(--bull-fg); border-color: var(--bull-br); }
+    .sentiment-bearish { background: var(--bear-bg); color: var(--bear-fg); border-color: var(--bear-br); }
+    .sentiment-neutral { background: var(--neut-bg); color: var(--neut-fg); border-color: var(--neut-br); }
+
+    /* ---- Reading time ---- */
+    .reading-time {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    /* ---- Summary & why-it-matters ---- */
     .summary {
       font-size: 0.93rem;
       line-height: 1.65;
       margin-bottom: 0.75rem;
     }
     .why-matters {
-      background: #f0f4f8;
+      background: var(--why-bg);
       border-radius: 5px;
       padding: 0.6rem 0.9rem;
       font-size: 0.87rem;
+      transition: background 0.25s;
     }
-    .why-matters strong {
-      color: var(--navy);
-      font-family: Arial, sans-serif;
-    }
-    .why-matters ul {
-      margin: 0.3rem 0 0 1.2rem;
-      padding: 0;
-    }
+    .why-matters strong { color: var(--navy); font-family: Arial, sans-serif; }
+    .why-matters ul { margin: 0.3rem 0 0 1.2rem; padding: 0; }
     .why-matters li { margin-bottom: 0.2rem; }
+
     /* ---- Shortfall notice ---- */
     .shortfall-notice {
       color: var(--red);
@@ -158,6 +351,7 @@
       border: 1px dashed var(--red);
       border-radius: 4px;
     }
+
     /* ---- Footer ---- */
     footer {
       margin-top: 3rem;
@@ -168,639 +362,226 @@
       font-family: Arial, sans-serif;
     }
     footer p { margin-bottom: 0.3rem; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 860px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
+        padding: 1rem 1rem 3rem;
+      }
+      .sidebar { display: none; }
+      .category-nav { display: flex; }
+      .dm-toggle { top: 0.6rem; right: 0.6rem; }
+    }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Daily Financial Digest</h1>
-  <p class="digest-meta">
-    Wednesday, April 29, 2026 &nbsp;&bull;&nbsp;
-    22 stories across 7 categories &nbsp;&bull;&nbsp;
-    Generated 2026-04-29 08:00 UTC
-  </p>
-</header>
+<button class="dm-toggle" id="dm-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
 
-<nav class="category-nav">
-  
-  <a href="#global">🌍 Global</a>
-  
-  <a href="#market">📈 Market</a>
-  
-  <a href="#stock">🏢 Stock</a>
-  
-  <a href="#tech">💻 Tech</a>
-  
-  <a href="#ai_apps">🤖 AI_Apps</a>
-  
-  <a href="#industry_academia">🏭 Industry_Academia</a>
-  
-  <a href="#portfolio">⭐ Portfolio</a>
-  
-</nav>
+<div class="page-wrapper">
 
+  <!-- Sticky sidebar (desktop only) -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav" aria-label="Category navigation">
+      <p class="sidebar-heading">Contents</p>
+      
+      <a href="#global" class="sidebar-link">🌍 Global</a>
+      
+      <a href="#market" class="sidebar-link">📈 Market</a>
+      
+      <a href="#stock" class="sidebar-link">🏢 Stock</a>
+      
+      <a href="#tech" class="sidebar-link">💻 Tech</a>
+      
+      <a href="#ai_apps" class="sidebar-link">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia" class="sidebar-link">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio" class="sidebar-link">⭐ Portfolio</a>
+      
+    </nav>
+  </aside>
 
-<section class="category-section" id="global">
-  <h2 class="category-header">🌍 Global</h2>
-  <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
+  <!-- Main content -->
+  <main class="main-content">
 
-  
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.theguardian.com/world/2026/apr/29/wednesday-briefing-where-starmer-stands-after-another-precarious-day-in-parliament" target="_blank" rel="noopener noreferrer">
-        Wednesday briefing: Where Starmer stands after another precarious day in parliament
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">The Guardian World</span>
-        Apr 29, 2026 05:45 UTC
-        &bull; Patrick Greenfield
-        <span class="score-badge">Score&nbsp;79.7</span>
-      </div>
-      <p class="summary">In today’s newsletter: As Labour braces for heavy local election losses, senior figures ​are signalling unease and​ morale ​is sinking​, can the prime minister hang on? Good morning. Keir Starmer is on thin ice. The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.cnbc.com/2026/04/29/us-treasury-warns-sanctions-china-refineries-iran-oil-malaysian-blend.html" target="_blank" rel="noopener noreferrer">
-        U.S. warns banks of sanctions risk over China ‘teapot’ refineries handling Iranian oil
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-cnbc">CNBC</span>
-        
-        Apr 29, 2026 03:29 UTC
-        
-        <span class="score-badge">Score&nbsp;50.3</span>
-      </div>
-      <p class="summary">The alert said China purchases approximately 90% of Iran&#39;s oil exports, with teapot refineries accounting for the majority of these imports. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ markets section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for China and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.theguardian.com/australia-news/2026/apr/29/anthony-albanese-rules-out-gas-export-tax-australia" target="_blank" rel="noopener noreferrer">
-        Anthony Albanese rules out gas export tax on existing contracts and criticises ‘populist’ campaign
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">The Guardian World</span>
-        Apr 29, 2026 05:48 UTC
-        &bull; Dan Jervis-Bardy, Josh Butler, Krishani Dhanji and Lisa Cox
-        <span class="score-badge">Score&nbsp;48.0</span>
-      </div>
-      <p class="summary">Prime minister says the middle of a global fuel crisis is ‘the worst possible time to jeopardise’ Australia’s partnerships with Asian trading partners Follow our Australia news live blog for latest updates Get our breaking news email , free app or daily news podcast The prime minister, Anthony Albanese, has confirmed next month’s federal budget will not include a new tax on existing gas export contracts as he criticised the “populist” campaign calling for a levy on producers. As reported last week , Albanese was poised to reject pressure to introduce a 25% tax on gas exports amid concerns the intervention could alienate the same Asian trading partners Australia is relying on for supplies of diesel and petrol. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for Asia and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <header>
+      <h1>Daily Financial Digest</h1>
+      <p class="digest-meta">
+        Wednesday, April 29, 2026 &nbsp;&bull;&nbsp;
+        0 stories across 7 categories &nbsp;&bull;&nbsp;
+        Generated 2026-04-29 23:45 UTC
+      </p>
+    </header>
 
-<section class="category-section" id="market">
-  <h2 class="category-header">📈 Market</h2>
-  <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
+    
 
-  
     
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91532789/over-80-of-workers-are-considering-leaving-the-u-s" target="_blank" rel="noopener noreferrer">
-        Over 80% of workers are more likely to consider leaving the U.S., survey suggests
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Dan Schawbel
-        <span class="score-badge">Score&nbsp;88.0</span>
-      </div>
-      <p class="summary">For decades, the American Dream was rooted in opportunity at home. Today, a growing number of workers are redefining that dream and increasingly, it doesn’t include staying in the United States. A mix of economic pressure, shifting expectations, and global opportunity is pushing employees to consider life and work abroad in ways that would have been unthinkable just a few years ago. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
-          
-          <li>Traders are repricing euro exposure in response to the latest macro data.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533623/the-last-thing-keeping-flights-cheap-is-cracking-and-youll-feel-it-on-your-next-trip" target="_blank" rel="noopener noreferrer">
-        The last thing keeping flights cheap is cracking—and you’ll feel it on your next trip
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Taylor Hatmaker
-        <span class="score-badge">Score&nbsp;79.0</span>
-      </div>
-      <p class="summary">The Trump administration might save Spirit Airlines from its latest brush with death, and now more airlines are asking for a handout. A budget airline coalition representing Frontier, Spirit, and Avelo has asked the federal government to consider setting aside a $2.5 billion pool of funds to offset the high price of fuel, as a result of the war in Iran. The organization, the Association of Value Airlines, says that the cash could “stabilize operations and keep airfares affordable” and likens the proposal to the CARES Act, which kept businesses afloat in the early days of the COVID-19 pandemic. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
-          
-          <li>Traders are repricing oil exposure in response to the latest macro data.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533195/i-almost-become-paranoid-why-anxiety-is-so-much-worse-in-the-middle-of-the-night" target="_blank" rel="noopener noreferrer">
-        ‘I almost become paranoid’: Why anxiety is so much worse in the middle of the night
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Gwen Moran
-        <span class="score-badge">Score&nbsp;72.4</span>
-      </div>
-      <p class="summary">You know the scenario: It’s nighttime. You’re cozy under the bed covers, drifting off to sleep. Then, your eyes fly open.&amp;nbsp; Wow, that was a big credit card bill this month. The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
-          
-          <li>Traders are repricing euro exposure in response to the latest macro data.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
 
-<section class="category-section" id="stock">
-  <h2 class="category-header">🏢 Stock</h2>
-  <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
+    <!-- Mobile nav pills -->
+    <nav class="category-nav" aria-label="Jump to category">
+      
+      <a href="#global">🌍 Global</a>
+      
+      <a href="#market">📈 Market</a>
+      
+      <a href="#stock">🏢 Stock</a>
+      
+      <a href="#tech">💻 Tech</a>
+      
+      <a href="#ai_apps">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio">⭐ Portfolio</a>
+      
+    </nav>
 
-  
     
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533649/tinder-owner-match-group-buying-sniffies-lgbtq-investment" target="_blank" rel="noopener noreferrer">
-        Is Tinder’s owner buying Sniffies? What Match Group’s investment means for the gay cruising platform
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; David Salazar
-        <span class="score-badge">Score&nbsp;86.0</span>
-      </div>
-      <p class="summary">The parent company of Hinge and Tinder is courting a potential new addition to its roster. Match Group on Monday announced a $100 million investment in Sniffies, a map-based cruising platform for queer men.&amp;nbsp; As part of the investment, Sniffies will continue to be led by founder and CEO Blake Gallagher, the company said. “From the first conversations with the Match Group team, we knew they understood what makes Sniffies different. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Is Tinder shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
-          
-          <li>Has direct implications for equity and/or bond market pricing.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91530209/a-ceo-asked-hundreds-of-employees-to-move-then-he-quit" target="_blank" rel="noopener noreferrer">
-        A CEO asked employees to move across the country. Then he quit
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Rheana Murray
-        <span class="score-badge">Score&nbsp;83.2</span>
-      </div>
-      <p class="summary">In January 2025, Fortune Brands Innovations announced it was moving its company’s portfolio from individual offices across the country to one central headquarters outside Chicago, which meant hundreds of employees would need to relocate, or else lose their jobs. The move would take place in a phased approach beginning at the end of the summer, then-CEO Nicholas Fink told employees. Unsurprisingly, the news sent a jolt through the company, which owns several home and security brands including Moen and Master Lock, employees told Fast Company . The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>The company shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
-          
-          <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533616/elon-musk-is-taking-on-openai-in-court-today-heres-whats-at-stake" target="_blank" rel="noopener noreferrer">
-        Elon Musk is taking on OpenAI in court today—here’s what’s at stake
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Michael Grothaus
-        <span class="score-badge">Score&nbsp;73.8</span>
-      </div>
-      <p class="summary">Today, one of the biggest tech showdowns of the year begins. It’s the day on which the world’s richest man, Elon Musk, and the world’s most influential AI leader, Sam Altman, are expected to appear in court to issue their opening statements in the OpenAI trial. Here’s what you need to know about the high-stakes case. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Elon Musk shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
-          
-          <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <section class="category-section" id="global">
+      <h2 class="category-header">🌍 Global</h2>
+      <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
 
-<section class="category-section" id="tech">
-  <h2 class="category-header">💻 Tech</h2>
-  <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
+    
+    <section class="category-section" id="market">
+      <h2 class="category-header">📈 Market</h2>
+      <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
 
-  
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
     
-    <div class="article-card">
-      <a class="article-title" href="https://finance.yahoo.com/video/nasdaq-p-500-end-lower-221116038.html" target="_blank" rel="noopener noreferrer">
-        Nasdaq, S&amp;P 500 end lower on renewed AI growth worries
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-yahoo">Yahoo Finance</span>
-        
-        Apr 28, 2026 22:39 UTC
-        
-        <span class="score-badge">Score&nbsp;80.8</span>
-      </div>
-      <p class="summary">STORY: U.S. stocks ended lower on Tuesday, with the Dow ticking down marginally, the S&amp;P 500 shedding about half a percent and the tech-heavy Nasdaq losing nine-tenths of a percent. AI-related fears spooked the market after the reported that OpenAI missed internal targets for weekly users and revenue, raising concerns about its ability to support its massive spending on data centers. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
-          
-          <li>Has direct implications for equity and/or bond market pricing.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533544/cursor-claude-ai-agent-deleted-software-company-pocket-os-database-jer-crane" target="_blank" rel="noopener noreferrer">
-        ‘I violated every principle I was given’: An AI agent deleted a software company’s entire database. It may not be the AI’s fault
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Jude Cramer
-        <span class="score-badge">Score&nbsp;76.0</span>
-      </div>
-      <p class="summary">Another cautionary tale about AI has hit social media. This time, a software company’s founder is claiming that a Claude-powered version of AI coding tool Cursor deleted his entire production database in just nine seconds.&amp;nbsp; Jer Crane is the founder of PocketOS, a company that develops software primarily for car rental companies. In a post that’s garnered 6.5 million views on X , Crane alleged that a perfect storm of Cursor acting without permission and Railway, his company’s infrastructure provider, improperly storing backups led to massive data loss. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
-          
-          <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91532782/warp-is-going-open-source-and-wants-you-to-improve-its-coding-tools-with-ai" target="_blank" rel="noopener noreferrer">
-        Warp is going open source and wants you to improve its coding tools with AI
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Steven Melendez
-        <span class="score-badge">Score&nbsp;75.3</span>
-      </div>
-      <p class="summary">AI has made it easy to generate software code, but&amp;nbsp; some open source projects have &amp;nbsp;stopped taking code submissions from the public, citing a deluge of&amp;nbsp;low quality&amp;nbsp;code or code that&amp;nbsp;doesn’t&amp;nbsp;match project needs.&amp;nbsp; Warp ,&amp;nbsp; maker of tools for AI coding , is moving in the opposite direction.&amp;nbsp;It’s&amp;nbsp;making its desktop agentic development environment (ADE) software&amp;nbsp;open source and even encouraging users to contribute new features with the help of AI.&amp;nbsp;The ADE&amp;nbsp;lets humans and AI agents work together to write code.&amp;nbsp;&amp;nbsp; Founder and CEO Zach Lloyd says software developers typically have their own preferences on tools and working styles, and he anticipates the program will let some of its nearly&amp;nbsp;1 million users&amp;nbsp;add new features that best suit their needs faster than the Warp team could do on its own.&amp;nbsp;&amp;nbsp; “One thing that I&amp;#8217;ve realized the longer I&amp;#8217;ve been building for developers is that they have very diverse workflows,” Lloyd says.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
-          
-          <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <section class="category-section" id="stock">
+      <h2 class="category-header">🏢 Stock</h2>
+      <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
 
-<section class="category-section" id="ai_apps">
-  <h2 class="category-header">🤖 AI_Apps</h2>
-  <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
+    
+    <section class="category-section" id="tech">
+      <h2 class="category-header">💻 Tech</h2>
+      <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
 
-  
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
     
-    <div class="article-card">
-      <a class="article-title" href="https://www.cnbc.com/2026/04/28/meta-muse-spark-has-promise-wall-street-wants-zuckerberg-ai-strategy.html" target="_blank" rel="noopener noreferrer">
-        Meta&#39;s new AI model shows early promise, but investors want to see Zuckerberg&#39;s strategy
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-cnbc">CNBC</span>
-        
-        Apr 28, 2026 20:04 UTC
-        
-        <span class="score-badge">Score&nbsp;41.0</span>
-      </div>
-      <p class="summary">Meta introduced its new AI model at the beginning of the second quarter, so Mark Zuckerberg&#39;s commentary about the future will be key during earnings. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://techcrunch.com/2026/04/28/amazon-is-already-offering-new-openai-products-on-aws/" target="_blank" rel="noopener noreferrer">
-        Amazon is already offering new OpenAI products on AWS
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-techcrunch">TechCrunch</span>
-        
-        Apr 28, 2026 19:48 UTC
-        &bull; Julie Bort
-        <span class="score-badge">Score&nbsp;32.1</span>
-      </div>
-      <p class="summary">A day after OpenAI got Microsoft to agree to end exclusive rights, AWS announced a slate of OpenAI model offerings, including a new agent service. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://fortune.com/2026/04/28/bloomberg-askb-ai-agents-lessons-from-bloomberg-cto-shawn-edwards-eye-on-ai/" target="_blank" rel="noopener noreferrer">
-        Bloomberg, the OG of financial data firms, has a potent new AI agent. How it built it holds lessons for other companies
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fortune</span>
-        Apr 28, 2026 21:15 UTC
-        &bull; Jeremy Kahn
-        <span class="score-badge">Score&nbsp;31.4</span>
-      </div>
-      <p class="summary">Bloomberg&#39;s &#34;AskB&#34; shows the potential of AI agents in finance. Building it wasn&#39;t easy, Bloomberg CTO says. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <section class="category-section" id="ai_apps">
+      <h2 class="category-header">🤖 AI_Apps</h2>
+      <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
 
-<section class="category-section" id="industry_academia">
-  <h2 class="category-header">🏭 Industry_Academia</h2>
-  <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
+    
+    <section class="category-section" id="industry_academia">
+      <h2 class="category-header">🏭 Industry_Academia</h2>
+      <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
 
-  
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
     
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91533482/wren-kitchens-home-depot-chapter-7-bankruptcy-filing-showrooms-studios-abruptly-closing" target="_blank" rel="noopener noreferrer">
-        Customers blindsided as Wren Kitchens abruptly shutters showrooms and Home Depot studios after Chapter 7 bankruptcy
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Natasha Etzel
-        <span class="score-badge">Score&nbsp;51.2</span>
-      </div>
-      <p class="summary">U.K.-based Wren Kitchens abruptly ceased all U.S. operations on April 23, shuttering all brick-and-mortar retail locations and all of its showroom studios inside The Home Depot stores nationwide. Court documents show that Wren Kitchens filed for Chapter 7 bankruptcy in the District of Delaware bankruptcy court on April 24. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://fortune.com/2026/04/29/why-do-workers-hate-ai-more-productive-training-obsolete/" target="_blank" rel="noopener noreferrer">
-        The uncomfortable truth about AI and the American worker
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fortune</span>
-        Apr 29, 2026 07:11 UTC
-        &bull; Nick Lichtenberg
-        <span class="score-badge">Score&nbsp;47.6</span>
-      </div>
-      <p class="summary">Workers fear the robots are coming for their jobs. New research shows the opposite — and why that might actually be more unsettling. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.theguardian.com/environment/2026/apr/29/england-homes-high-risk-flooding-towns-cities-urban-environment-study" target="_blank" rel="noopener noreferrer">
-        Urban areas host 80% of England’s homes at high risk of flooding, study finds
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">The Guardian World</span>
-        Apr 29, 2026 05:00 UTC
-        &bull; Jessica Murray Social affairs correspondent
-        <span class="score-badge">Score&nbsp;42.1</span>
-      </div>
-      <p class="summary">Exclusive: 839,000 homes in urban areas face threat of surface-water flooding, with social housing tenants most vulnerable to costs Eight in 10 of the homes that are at high risk of flooding in England are now in towns and cities, according to analysis by the National Housing Federation (NHF), which said social housing tenants are disproportionately vulnerable to the financial cost. Research found that 839,000 homes in urban areas are now classed as being at high risk of surface water flooding, a threefold increase since 2018. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <section class="category-section" id="portfolio">
+      <h2 class="category-header">⭐ Portfolio</h2>
+      <p class="category-desc">Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)</p>
 
-<section class="category-section" id="portfolio">
-  <h2 class="category-header">⭐ Portfolio</h2>
-  <p class="category-desc">Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)</p>
+      
+        <div class="shortfall-notice">
+          No articles found for this category today. Check logs for SHORTFALL details.
+        </div>
+      
+    </section>
+    
 
-  
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.fastcompany.com/91532826/25-years-ago-jeff-bezos-said-this-best-way-deal-stress-science-says-hes-still-right" target="_blank" rel="noopener noreferrer">
-        25 years ago, Jeff Bezos said this is the best way to deal with stress. Science says he’s still right
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">Fast Company</span>
-        Apr 29, 2026 08:00 UTC
-        &bull; Inc.
-        <span class="score-badge">Score&nbsp;44.7</span>
-      </div>
-      <p class="summary">While it sounds silly, especially since I have a variety of construction skills, I lay awake some nights stressing about our stairs. We had gotten quotes for replacing the carpet on our stairs with white oak, but the average estimate, not including materials, was $10,000 per flight. Three flights of stairs, at $10K per?. The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.theguardian.com/australia-news/2026/apr/29/rebel-wilson-a-bit-anxious-as-film-directors-defamation-trial-testimony-enters-second-day-ntwnfb" target="_blank" rel="noopener noreferrer">
-        Rebel Wilson rejects ‘absolutely outrageous’ phone-dumping accusation as defamation trial continues
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">The Guardian World</span>
-        Apr 29, 2026 03:55 UTC
-        &bull; Australian Associated Press
-        <span class="score-badge">Score&nbsp;32.3</span>
-      </div>
-      <p class="summary">The Pitch Perfect actor is being sued by Charlotte MacInnes, the lead actor of Wilson’s directorial debut, The Deb Hollywood star Rebel Wilson has rejected an “absolutely outrageous” accusation that she dumped her phone to avoid handing over key communications in a defamation case. The Pitch Perfect star is being sued by Charlotte MacInnes, the 27-year-old lead actor of the musical comedy The Deb. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.theguardian.com/technology/2026/apr/28/the-tin-can-phone-is-this-the-simple-secret-to-a-screen-free-childhood" target="_blank" rel="noopener noreferrer">
-        The Tin Can phone: is this the simple secret to a screen-free childhood?
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-other">The Guardian Technology</span>
-        Apr 28, 2026 15:10 UTC
-        &bull; Guardian Staff
-        <span class="score-badge">Score&nbsp;20.0</span>
-      </div>
-      <p class="summary">Created by three dads from Seattle, the resolutely un-mobile handset doesn’t have internet access, apps or even a screen. No wonder anxious parents are snapping it up Name: Tin Can. Age: Launched last April. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-    <div class="article-card">
-      <a class="article-title" href="https://www.cnbc.com/2026/04/25/right-to-repair-consumer-prices-affordability-economy-elections.html" target="_blank" rel="noopener noreferrer">
-        From car and phone to tractor owners, a populist wave is rising to end the &#39;captive&#39; repair economy
-      </a>
-      <div class="article-meta">
-        
-        <span class="source-badge source-cnbc">CNBC</span>
-        
-        Apr 28, 2026 18:18 UTC
-        
-        <span class="score-badge">Score&nbsp;19.1</span>
-      </div>
-      <p class="summary">&#34;Right to repair&#34; legislation is an issue that political candidates across the U.S. have made part of their affordability messaging. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
-      <div class="why-matters">
-        <strong>Why it matters:</strong>
-        <ul>
-          
-          <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
-          
-          <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
-          
-        </ul>
-      </div>
-    </div>
-    
-  
-</section>
+    <footer>
+      <p>Generated 2026-04-29 23:45 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
+      <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
+    </footer>
 
+  </main>
+</div>
 
-<footer>
-  <p>Generated 2026-04-29 08:00 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
-  <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
-</footer>
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('dm-toggle');
+
+  function applyDark(on) {
+    document.body.classList.toggle('dark-mode', on);
+    btn.textContent = on ? '☀️' : '🌙';
+  }
+
+  // Restore persisted preference
+  try { applyDark(localStorage.getItem('dm') === '1'); } catch (e) {}
+
+  btn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('dark-mode');
+    btn.textContent = on ? '☀️' : '🌙';
+    try { localStorage.setItem('dm', on ? '1' : '0'); } catch (e) {}
+  });
+
+  // Lazy-reveal article cards via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    var cardIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          cardIO.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      cardIO.observe(c);
+    });
+  } else {
+    // Fallback: reveal all cards immediately for older browsers
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      c.classList.add('visible');
+    });
+  }
+
+  // Highlight active sidebar link as user scrolls
+  var sections = document.querySelectorAll('.category-section');
+  var sideLinks = document.querySelectorAll('.sidebar-link');
+  if (sections.length && sideLinks.length && 'IntersectionObserver' in window) {
+    var secIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          sideLinks.forEach(function (l) { l.classList.remove('active'); });
+          var active = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.25 });
+    sections.forEach(function (s) { secIO.observe(s); });
+  }
+})();
+</script>
 
 </body>
 </html>

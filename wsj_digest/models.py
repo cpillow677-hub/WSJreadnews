@@ -28,6 +28,7 @@ class Article:
     recency_score: float = 0.0
     market_relevance_score: float = 0.0
     total_score: float = 0.0              # weighted composite 0–100
+    sentiment: str = "Neutral"            # "Bullish" | "Bearish" | "Neutral"
 
     # --- Raw content (from RSS description / scraped lead) ---
     lead_text: str = ""
@@ -106,4 +107,8 @@ class Article:
             "author": self.author,
             "summary": self.summary,
             "why_it_matters": self.why_it_matters,
+            "sentiment": self.sentiment,
+            "reading_time": max(1, min(8, round(
+                len((self.summary or self.lead_text or self.title).split()) / 50
+            ))),
         }

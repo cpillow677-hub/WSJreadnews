@@ -18,6 +18,32 @@ from .models import Article
 logger = logging.getLogger(__name__)
 
 # ------------------------------------------------------------------ #
+# Sentiment signal word lists                                          #
+# ------------------------------------------------------------------ #
+BULLISH_SIGNALS = [
+    "growth", "surge", "soar", "rally", "gain", "beat", "exceed",
+    "profit", "record high", "record profit", "upgrade", "outperform",
+    "breakthrough", "expansion", "boom", "recovery", "rebound",
+    "optimistic", "opportunity", "raised guidance", "raised outlook",
+    "dividend increase", "buyback", "launch", "innovation", "partnership",
+    "positive", "strong", "jumped", "climbed", "rose", "increased",
+    "higher", "upside", "strengthened", "deal closed", "ipo priced",
+    "beat estimates", "topped estimates", "exceeded expectations",
+]
+
+BEARISH_SIGNALS = [
+    "decline", "fall", "plunge", "crash", "sell-off", "selloff", "slump",
+    "miss", "disappoint", "warning", "downgrade", "underperform", "loss",
+    "recession", "rate hike", "tariff", "sanction", "war", "conflict",
+    "layoff", "job cut", "bankruptcy", "default", "debt crisis",
+    "shortage", "risk", "uncertainty", "concern", "fear", "dropped",
+    "fell", "declined", "weakened", "lower", "negative", "bearish",
+    "cut guidance", "cut outlook", "missed estimates", "below expectations",
+    "inflation", "tightening", "slowdown", "contraction", "deficit",
+]
+
+
+# ------------------------------------------------------------------ #
 # Market-relevance signal terms                                        #
 # ------------------------------------------------------------------ #
 MARKET_SIGNALS = [
@@ -206,6 +232,29 @@ def _compute_total(
 
 
 # ------------------------------------------------------------------ #
+# Sentiment score                                                       #
+# ------------------------------------------------------------------ #
+
+def _compute_sentiment(article: Article) -> str:
+    """
+    Return 'Bullish', 'Bearish', or 'Neutral' based on signal-word ratio
+    in title + lead_text.
+    """
+    text = (article.title + " " + article.lead_text).lower()
+    bullish = sum(1 for s in BULLISH_SIGNALS if s in text)
+    bearish = sum(1 for s in BEARISH_SIGNALS if s in text)
+    total = bullish + bearish
+    if total == 0:
+        return "Neutral"
+    ratio = bullish / total
+    if ratio >= 0.55:
+        return "Bullish"
+    if ratio <= 0.45:
+        return "Bearish"
+    return "Neutral"
+
+
+# ------------------------------------------------------------------ #
 # Public entry point                                                   #
 # ------------------------------------------------------------------ #
 
@@ -233,6 +282,7 @@ def score_articles(articles: list[Article], config: dict) -> list[Article]:
                 article.market_relevance_score,
                 weights,
             )
+            article.sentiment = _compute_sentiment(article)
             category, cat_score = classify_article(article, category_defs)
             article.category = category
             article.category_score = cat_score
