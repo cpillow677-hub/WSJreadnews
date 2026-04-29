@@ -291,7 +291,7 @@
       const data = await res.json();
 
       if (res.ok) {
-        let msg = `✓ Saved — ${data.tickers.join(', ')} · Language: ${data.language_name}`;
+        let msg = `✓ Saved — ${data.portfolio_tickers.join(', ')} · Language: ${data.language_name}`;
         if (data.github_synced) msg += ' · Synced to GitHub ✓';
         else msg += ' · (Local only — set GITHUB_TOKEN to sync to repo)';
         showToast(msg, true);
