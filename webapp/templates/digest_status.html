@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Financial Digest</title>
+  {% if status == "running" %}
+  <meta http-equiv="refresh" content="10">
+  {% endif %}
+  <style>
+    :root { --navy: #003366; --red: #b30000; --bg: #f5f5f0; --muted: #666; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: #1a1a1a;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    h1 { font-size: 1.5rem; color: var(--navy); margin-bottom: 1rem; }
+    .icon { font-size: 3rem; margin-bottom: 1rem; }
+    p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; font-family: Arial, sans-serif; }
+    .ts { font-size: 0.78rem; color: #999; margin-top: 0.5rem; font-family: Arial, sans-serif; }
+    .btn {
+      display: inline-block; margin-top: 2rem;
+      padding: 0.6rem 1.5rem;
+      background: var(--navy); color: #fff;
+      text-decoration: none; border-radius: 4px;
+      font-family: Arial, sans-serif; font-size: 0.9rem;
+    }
+    .btn:hover { background: var(--red); }
+    .error-box {
+      margin-top: 1.5rem; padding: 1rem;
+      background: #fde8e8; border: 1px solid #f5b8b8;
+      border-radius: 4px; text-align: left;
+      font-size: 0.78rem; color: #800; font-family: monospace;
+      white-space: pre-wrap; word-break: break-all;
+    }
+    .spinner {
+      display: inline-block; width: 40px; height: 40px;
+      border: 4px solid #ddd; border-top-color: var(--navy);
+      border-radius: 50%; animation: spin 0.9s linear infinite;
+      margin-bottom: 1.5rem;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+{% if status == "running" %}
+  <div class="spinner"></div>
+  <h1>Generating your digest…</h1>
+  <p>Fetching and summarising the latest financial news.<br>
+     This usually takes 1–2 minutes. This page will refresh automatically.</p>
+  {% if timestamp %}<p class="ts">Started {{ timestamp[:16].replace('T',' ') }} UTC</p>{% endif %}
+
+{% elif status == "error" %}
+  <div class="icon">⚠️</div>
+  <h1>Generation failed</h1>
+  <p>The pipeline encountered an error. Check logs or try saving settings again.</p>
+  {% if timestamp %}<p class="ts">{{ timestamp[:16].replace('T',' ') }} UTC</p>{% endif %}
+  {% if error %}
+  <div class="error-box">{{ error }}</div>
+  {% endif %}
+  <a href="/" class="btn">← Back to Settings</a>
+
+{% else %}
+  <div class="icon">📰</div>
+  <h1>No digest available yet</h1>
+  <p>Save your settings to generate the first digest, or wait for the next<br>
+     scheduled run (09:00 台灣時間 / 01:00 UTC).</p>
+  <a href="/" class="btn">⚙ Go to Settings</a>
+{% endif %}
+
+</body>
+</html>

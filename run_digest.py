@@ -42,6 +42,7 @@ from wsj_digest.scorer import score_articles
 from wsj_digest.selector import select_top_articles
 from wsj_digest.summarizer import summarize_all
 from wsj_digest.renderer import render_html, render_markdown
+from wsj_digest.translator import translate_articles
 
 logger = logging.getLogger(__name__)
 
@@ -270,6 +271,13 @@ def main(argv: list[str] | None = None) -> int:
         logging.error("Config error: %s", exc)
         return 1
 
+    # --- Load and apply user settings (from webapp) ---
+    user_settings = load_user_settings(args.config)
+    apply_user_settings(config, user_settings)
+    digest_language = user_settings.get("language", "en")
+    if digest_language != "en":
+        logger.info("Output language: %s (translation enabled)", digest_language)
+
     # --- Apply CLI overrides ---
     settings = config.setdefault("settings", {})
     if args.max_age_hours is not None:
@@ -381,6 +389,21 @@ def main(argv: list[str] | None = None) -> int:
         logger.error("Summarization failed: %s", exc, exc_info=True)
         return 1
     logger.info("Step 4/5 complete: summaries generated")
+
+    # ---------------------------------------------------------------- #
+    # Step 4.5: Translate (if language != English)                       #
+    # ---------------------------------------------------------------- #
+    if digest_language != "en":
+        logger.info("-" * 40)
+        logger.info("Step 4.5/5: Translating summaries to '%s'...", digest_language)
+        try:
+            articles_by_category = translate_articles(
+                articles_by_category, digest_language
+            )
+        except Exception as exc:
+            logger.warning(
+                "Translation failed: %s — continuing with English summaries", exc
+            )
 
     # ---------------------------------------------------------------- #
     # Step 5: Render                                                     #
