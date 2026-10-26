@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Financial Digest &ndash; 2026-10-26</title>
+  <style>
+    /* ---- CSS variables: light mode ---- */
+    :root {
+      --navy:      #003366;
+      --red:       #b30000;
+      --bg:        #f5f5f0;
+      --card:      #ffffff;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --border:    #dddddd;
+      --why-bg:    #f0f4f8;
+      --sidebar-bg:#ffffff;
+      --bull-bg:   #e8f5e9; --bull-fg: #2e7d32; --bull-br: #a5d6a7;
+      --bear-bg:   #fce4ec; --bear-fg: #c62828; --bear-br: #ef9a9a;
+      --neut-bg:   #f5f5f5; --neut-fg: #555555; --neut-br: #bdbdbd;
+      --ticker-bg: #eef2f7;
+      --tldr-bg:   #fffbf0;
+      --tldr-br:   #e8a000;
+    }
+    /* ---- Dark mode overrides ---- */
+    body.dark-mode {
+      --navy:      #6eaeff;
+      --red:       #ff7b7b;
+      --bg:        #0f1117;
+      --card:      #1a1d27;
+      --text:      #e2e2e2;
+      --muted:     #8a8a9a;
+      --border:    #2a2d3a;
+      --why-bg:    #1e2235;
+      --sidebar-bg:#151720;
+      --bull-bg:   #1b3a22; --bull-fg: #66bb6a; --bull-br: #2e7d32;
+      --bear-bg:   #3a1a22; --bear-fg: #ef5350; --bear-br: #c62828;
+      --neut-bg:   #252535; --neut-fg: #9090a0; --neut-br: #3a3a50;
+      --ticker-bg: #1a1d2e;
+      --tldr-bg:   #1e1a08;
+      --tldr-br:   #8a6a00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    /* ---- Dark-mode toggle (fixed) ---- */
+    .dm-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background 0.25s, border-color 0.25s;
+      padding: 0;
+      line-height: 1;
+    }
+    .dm-toggle:hover { opacity: 0.85; }
+
+    /* ---- Two-column page grid ---- */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 860px);
+      gap: 2rem;
+      max-width: 1130px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ---- Sticky sidebar ---- */
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .sidebar-nav {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 0.8rem;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .sidebar-heading {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.4rem;
+    }
+    .sidebar-link {
+      display: block;
+      padding: 0.32rem 0.55rem;
+      margin-bottom: 0.1rem;
+      font-size: 0.82rem;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--border); }
+    .sidebar-link.active { background: var(--navy); color: #fff; }
+
+    /* ---- Main content column ---- */
+    .main-content { min-width: 0; }
+
+    /* ---- Header ---- */
+    header {
+      border-bottom: 4px double var(--red);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .digest-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-top: 0.4rem;
+    }
+
+    /* ---- Market data ticker banner ---- */
+    .market-ticker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 0;
+      background: var(--ticker-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 1.4rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      transition: background 0.25s;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.4rem;
+      white-space: nowrap;
+    }
+    .ticker-name  { color: var(--muted); font-size: 0.74rem; }
+    .ticker-price { font-weight: 700; color: var(--text); }
+    .ticker-change { font-weight: 600; font-size: 0.76rem; }
+    .ticker-item.ticker-up   .ticker-change { color: #2e7d32; }
+    .ticker-item.ticker-down .ticker-change { color: #c62828; }
+    body.dark-mode .ticker-item.ticker-up   .ticker-change { color: #66bb6a; }
+    body.dark-mode .ticker-item.ticker-down .ticker-change { color: #ef5350; }
+    .ticker-sep { color: var(--border); padding: 0 0.25rem; user-select: none; }
+
+    /* ---- TL;DR / Today's Brief ---- */
+    .tldr-section {
+      background: var(--tldr-bg);
+      border-left: 5px solid var(--tldr-br);
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.8rem;
+      transition: background 0.25s;
+    }
+    .tldr-label {
+      font-size: 0.64rem;
+      font-family: Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .tldr-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ---- Mobile top-nav pills (hidden on desktop) ---- */
+    .category-nav {
+      display: none;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .category-nav a {
+      background: var(--navy);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.28rem 0.72rem;
+      border-radius: 20px;
+      font-size: 0.80rem;
+      font-family: Arial, sans-serif;
+      transition: background 0.15s;
+    }
+    .category-nav a:hover { background: var(--red); }
+
+    /* ---- Category section ---- */
+    .category-section { margin-bottom: 3rem; }
+    .category-header {
+      font-size: 1.45rem;
+      color: var(--navy);
+      border-left: 5px solid var(--red);
+      padding-left: 0.65rem;
+      margin-bottom: 0.3rem;
+    }
+    .category-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 1.2rem;
+      padding-left: 0.9rem;
+    }
+
+    /* ---- Article card (lazy-reveal via JS) ---- */
+    .article-card {
+      background: var(--card);
+      border-left: 4px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.3rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  background 0.25s, box-shadow 0.25s;
+    }
+    .article-card.visible { opacity: 1; transform: translateY(0); }
+
+    .article-title {
+      font-size: 1.08rem;
+      font-weight: bold;
+      color: var(--navy);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .article-title:hover { text-decoration: underline; color: var(--red); }
+
+    .article-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-bottom: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ---- Source badges ---- */
+    .source-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      letter-spacing: 0.3px;
+    }
+    .source-yahoo       { background: #6001d2; color: #fff; }
+    .source-cnbc        { background: #c00;    color: #fff; }
+    .source-wsj         { background: #003366; color: #fff; }
+    .source-economist   { background: #e3120b; color: #fff; }
+    .source-cnn         { background: #cc0000; color: #fff; }
+    .source-ibd         { background: #e06000; color: #fff; }
+    .source-techcrunch  { background: #0a7d3e; color: #fff; }
+    .source-marketwatch { background: #004b87; color: #fff; }
+    .source-reuters     { background: #ff8000; color: #fff; }
+    .source-other       { background: #555;    color: #fff; }
+
+    /* ---- Score badge ---- */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.68rem;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ---- Sentiment badge ---- */
+    .sentiment-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      border: 1px solid;
+    }
+    .sentiment-bullish { background: var(--bull-bg); color: var(--bull-fg); border-color: var(--bull-br); }
+    .sentiment-bearish { background: var(--bear-bg); color: var(--bear-fg); border-color: var(--bear-br); }
+    .sentiment-neutral { background: var(--neut-bg); color: var(--neut-fg); border-color: var(--neut-br); }
+
+    /* ---- Reading time ---- */
+    .reading-time {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    /* ---- Summary & why-it-matters ---- */
+    .summary {
+      font-size: 0.93rem;
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+    .why-matters {
+      background: var(--why-bg);
+      border-radius: 5px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.87rem;
+      transition: background 0.25s;
+    }
+    .why-matters strong { color: var(--navy); font-family: Arial, sans-serif; }
+    .why-matters ul { margin: 0.3rem 0 0 1.2rem; padding: 0; }
+    .why-matters li { margin-bottom: 0.2rem; }
+
+    /* ---- Shortfall notice ---- */
+    .shortfall-notice {
+      color: var(--red);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px dashed var(--red);
+      border-radius: 4px;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+    footer p { margin-bottom: 0.3rem; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 860px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
+        padding: 1rem 1rem 3rem;
+      }
+      .sidebar { display: none; }
+      .category-nav { display: flex; }
+      .dm-toggle { top: 0.6rem; right: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="dm-toggle" id="dm-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+<div class="page-wrapper">
+
+  <!-- Sticky sidebar (desktop only) -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav" aria-label="Category navigation">
+      <p class="sidebar-heading">Contents</p>
+      
+      <a href="#global" class="sidebar-link">🌍 Global</a>
+      
+      <a href="#market" class="sidebar-link">📈 Market</a>
+      
+      <a href="#stock" class="sidebar-link">🏢 Stock</a>
+      
+      <a href="#tech" class="sidebar-link">💻 Tech</a>
+      
+      <a href="#ai_apps" class="sidebar-link">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia" class="sidebar-link">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio" class="sidebar-link">⭐ Portfolio</a>
+      
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+
+    <header>
+      <h1>Daily Financial Digest</h1>
+      <p class="digest-meta">
+        Monday, October 26, 2026 &nbsp;&bull;&nbsp;
+        21 stories across 7 categories &nbsp;&bull;&nbsp;
+        Generated 2026-10-26 12:00 UTC
+      </p>
+    </header>
+
+    
+
+    
+    <div class="tldr-section" role="note" aria-label="Today's brief">
+      <p class="tldr-label">Today&rsquo;s Brief</p>
+      <p class="tldr-text">Netflix has been pumping out original content for so long and at such an immense scale that it recently released its second original movie entitled War Machine , headlining today&#39;s digest. Markets are navigating a mix of macro and corporate developments spanning Global, Market and beyond. Across 21 curated stories today, overall tone is balanced, with bullish and bearish signals roughly in equilibrium.</p>
+    </div>
+    
+
+    <!-- Mobile nav pills -->
+    <nav class="category-nav" aria-label="Jump to category">
+      
+      <a href="#global">🌍 Global</a>
+      
+      <a href="#market">📈 Market</a>
+      
+      <a href="#stock">🏢 Stock</a>
+      
+      <a href="#tech">💻 Tech</a>
+      
+      <a href="#ai_apps">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio">⭐ Portfolio</a>
+      
+    </nav>
+
+    
+    <section class="category-section" id="global">
+      <h2 class="category-header">🌍 Global</h2>
+      <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/world/2026/oct/26/brazil-presidential-elections-luiz-inacio-lula-da-silva-flavio-bolsonaro" target="_blank" rel="noopener noreferrer">
+            Brazil keeps left: what Lula’s victory means for his country and beyond
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Oct 26, 2026 06:44 UTC</span>
+            <span>&bull; Libby Brooks</span>
+            <span class="score-badge">Score&nbsp;54.0</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">In today’s newsletter: As Luiz Inácio Lula da Silva secured victory in the presidential race, we look the implications for democracy, the environment and international relations Good morning. Chances are you woke this morning to news of two momentous election results. In Serbia, a student-led movement has ousted the country’s long-serving leader, Aleksandar Vučić (which you can about here ). The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/world/live/2026/oct/26/serbia-vucic-elections-students-bulgaria-france-urkaine-russia-latest-news-updates" target="_blank" rel="noopener noreferrer">
+            Serbia wakes up to new reality after student-led movement ousts Vučić – Europe live
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Oct 26, 2026 11:15 UTC</span>
+            <span>&bull; Jakub Krupa</span>
+            <span class="score-badge">Score&nbsp;52.6</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Hopes raised for a reset in relations with EU and other partners following the defeat of authoritarian president Serbian leader ousted by student movement in seismic election More European leaders have now logged in after the weekend and are sending their congratulations to Serbia’s Student List after their win over Vučić last night. Ukraine’s president Volodymyr Zelenskyy said: “There have been changes in Serbia – a victory of the Student List @studentblokade. And this is clearly a new chapter in the history of the country and its people. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91628207/mesoamerican-modern-book-su-wu-phaidon" target="_blank" rel="noopener noreferrer">
+            ‘Mesoamerican Modern’ redefines how we understand Mexican architecture
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; María José Gutiérrez Chávez</span>
+            <span class="score-badge">Score&nbsp;52.4</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">To walk through Mexico City is to stroll down centuries at once. The ruins of the Aztec empire are exposed on the ground beside colonial structures built from the same stones that once made up the ancient temples. A few blocks farther, 1900s European-inspired townhouses are pressed against 1940s Art Deco apartments, and modern skyscrapers shoulder through the city’s diverse skyline. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="market">
+      <h2 class="category-header">📈 Market</h2>
+      <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91613866/apple-third-party-accessories" target="_blank" rel="noopener noreferrer">
+            When to buy Apple’s accessories (and which ones to buy cheaper elsewhere)
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Doug Aamoth</span>
+            <span class="score-badge">Score&nbsp;71.1</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Dropping $1,200 on a brand-new iPhone only to have an Apple Store salesperson casually hand you a $49 silicone case and a $39 charging brick feels like a minor mugging. Yes, Apple’s accessory margins are legendary. The company has built a multibillion-dollar side business selling $19 polishing cloths and $39 plastic dongles, banking on the assumption that you will blindly buy official gear for everything just to keep your new device working safely. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing gold exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.marketwatch.com/story/the-kospi-index-is-the-leading-indicator-for-the-global-ai-trade-and-goldman-just-slashed-its-forecast-by-25-ccfe2690" target="_blank" rel="noopener noreferrer">
+            The Kospi index is the leading indicator for the global AI trade — and Goldman just slashed its forecast by 25%
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-marketwatch">MarketWatch</span>
+            
+            <span>Oct 26, 2026 10:43 UTC</span>
+            <span>&bull; Jules Rimmer</span>
+            <span class="score-badge">Score&nbsp;58.7</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">A reduction in the growth multiple that investors are prepared to pay for AI stocks and a rise in volatility has forced Goldman strategist Tim Moe to take an axe to his Korean market target. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ markets section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing gold exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/education/2026/oct/26/goldsmiths-university-fine-arts-students-call-for-compensation-strikes" target="_blank" rel="noopener noreferrer">
+            Goldsmiths fine art students call for compensation over record tutor strike
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Oct 26, 2026 09:00 UTC</span>
+            <span>&bull; Richard Adams Education editor</span>
+            <span class="score-badge">Score&nbsp;56.3</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">With industrial action over job cuts heading into its 21st week, students at famed London college are unhappy Students arriving at Goldsmiths, University of London this autumn found a campus embroiled in a bitter industrial dispute that has upended timetables and disrupted courses. “I was really excited to start my studies at Goldsmiths,” one international student told the Guardian at a gathering of unhappy students on Friday. “But when I first arrived, I was quite shocked because almost all the induction sessions seemed to turn into discussions about strikes.” Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing oil exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="stock">
+      <h2 class="category-header">🏢 Stock</h2>
+      <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91628523/netflix-lost-place-in-pop-culture-high-viewership" target="_blank" rel="noopener noreferrer">
+            From zeitgeist to zeitghost: How Netflix kept a hold on viewers—but lost its spot in pop culture
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Joe Berkowitz</span>
+            <span class="score-badge">Score&nbsp;89.6</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Netflix has been pumping out original content for so long and at such an immense scale that it recently released its second original movie entitled War Machine . Although the Brad Pitt-starring first iteration sank like a stone in 2017, the unrelated new War Machine , led by Reacher ’s Alan Ritchson, was reportedly a ratings smash, hitting 10th on Netflix&amp;#8217;s all-time most-watched movies list , with 140 million views. So far, it’s the platform’s biggest movie this year. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>From shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Has direct implications for equity and/or bond market pricing.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91628418/trump-is-playing-real-estate-developer-with-national-treasures-this-group-is-fighting-back" target="_blank" rel="noopener noreferrer">
+            Trump is playing real estate developer with national treasures. This group is fighting back
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Nicole Gates Anderson</span>
+            <span class="score-badge">Score&nbsp;88.0</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Since President Trump returned to office, some of the nation’s best-known historic sites, from the White House’s ill-fated East Wing to the imperiled Kennedy Center, have come under attack, prompting preservationists to sue. The National Trust for Historic Preservation, a Washington, D.C.-based nonprofit, has been a central player in these prominent cases. Preservationists are gearing up for a prolonged legal fight to safeguard not only the landmarks themselves but the foundational protections of the National Historic Preservation Act (NHPA), passed in 1966. The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Trump shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Has direct implications for equity and/or bond market pricing.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91627787/why-quitting-your-job-might-be-your-best-decision-yet" target="_blank" rel="noopener noreferrer">
+            Why quitting your job might be your best decision yet
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Next Big Idea Club</span>
+            <span class="score-badge">Score&nbsp;84.4</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Below, Lindsay Crouse shares five key insights from her new book,&amp;nbsp; The Case for Quitting: The Surprising Benefits of Opting Out . Lindsay is a marathon runner and journalist who worked at The New York Times for 15 years. Her reporting helped bring maternity rights to pregnant Nike athletes. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Why shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Has direct implications for equity and/or bond market pricing.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="tech">
+      <h2 class="category-header">💻 Tech</h2>
+      <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91619326/the-ai-infrastructure-race-ive-seen-this-movie-before-technology-ai-infrastructure" target="_blank" rel="noopener noreferrer">
+            The AI infrastructure race: I’ve seen this movie before
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Jason Eichenholz</span>
+            <span class="score-badge">Score&nbsp;86.4</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Back in 2022, when the auto industry was fixated on autonomous vehicles, I was cofounder and chief technology officer at Luminar, where our lidar technology was helping enable the next generation of self-driving cars. Speaking at an automotive conference, I remarked how exciting it was to have a front-row seat to one of the most significant technological transformations in the industry’s history. Afterward, an automotive executive pulled me aside. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91626966/boards-preparing-to-fight-the-last-war" target="_blank" rel="noopener noreferrer">
+            Are boards preparing to fight the last war?
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Faisal Hoque</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">In the 1930s, France built the Maginot Line . This was a series of fortifications—fortresses, weapons, and various obstacles to invasion—that was more than 200 miles long. The Line was built for a world of static warfare, for a world of entrenched positions and slow, drawn-out military engagements. The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91628347/whats-really-fueling-the-recent-generosity-boom" target="_blank" rel="noopener noreferrer">
+            What’s really fueling the recent generosity boom
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Rob Walker</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Generosity is in the air, or so it would seem. The Trump administration recently mailed a round of $500 checks to almost a million users of Healthcare.gov. The AI rivals OpenAI and Anthropic have promised to share their (eventual) wealth with the public beyond investors, and Anthropic this week got a bit more specific, proposing a Public Benefit Fund pegged at 5% of the company’s overall value. The public offering will test investor appetite and provide a market valuation benchmark for comparable private-sector peers. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="ai_apps">
+      <h2 class="category-header">🤖 AI_Apps</h2>
+      <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/10/24/forced-to-pick-groks-ai-model-chooses-republicans-openais-picks-democrats/" target="_blank" rel="noopener noreferrer">
+            Forced to pick, Grok’s AI model chooses Republicans. OpenAI’s picks Democrats.
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Oct 24, 2026 15:00 UTC</span>
+            <span>&bull; Rebecca Bellan</span>
+            <span class="score-badge">Score&nbsp;18.4</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">A new study found Grok&#39;s AI overwhelmingly recommends Republican candidates while OpenAI&#39;s GPT favors Democrats, with the two AI models disagreeing in more than 90% of nearly 500 election races. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/10/25/grok-releases-the-first-seven-minutes-of-its-ai-generated-odyssey/" target="_blank" rel="noopener noreferrer">
+            Grok releases the first seven minutes of its AI-generated ‘Odyssey’
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Oct 25, 2026 21:31 UTC</span>
+            <span>&bull; Anthony Ha</span>
+            <span class="score-badge">Score&nbsp;17.3</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">1&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">The footage looks okay, as long as you&#39;re not seeking artistry, inspiration, or human interest. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="industry_academia">
+      <h2 class="category-header">🏭 Industry_Academia</h2>
+      <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.trefis.com/stock/crwv/articles/620478/what-could-go-wrong-at-coreweave-from-here/2026-10-26" target="_blank" rel="noopener noreferrer">
+            What Could Go Wrong At CoreWeave From Here?
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-yahoo">Yahoo Finance</span>
+            
+            <span>Oct 26, 2026 10:13 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;36.8</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">What Could Go Wrong At CoreWeave From Here?. For questions about this article or underlying research, email help@trefis.com. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.wired.com/story/oil-spills-wreak-havoc-on-the-bottom-of-the-ocean-even-a-decade-later/" target="_blank" rel="noopener noreferrer">
+            Oil Spills Wreak Havoc on the Bottom of the Ocean, Even a Decade Later
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Wired</span>
+            <span>Oct 25, 2026 10:30 UTC</span>
+            <span>&bull; Bob Berwyn</span>
+            <span class="score-badge">Score&nbsp;17.8</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">While oil is known to float, new research finds that over time it can permeate even extremely deep marine habitats, with animal populations declining by as much as 80 percent. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.bbc.co.uk/news/articles/c65yn9p55np2o" target="_blank" rel="noopener noreferrer">
+            Four ways Labour could raise money in the Budget without hiking income tax
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">BBC Business</span>
+            <span>Oct 25, 2026 06:00 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;6.4</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Chancellor John Healey may need to raise money to boost his fiscal headroom - BBC Verify examines what options could be on the table. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="portfolio">
+      <h2 class="category-header">⭐ Portfolio</h2>
+      <p class="category-desc">Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91629265/hunters-moon-2026-meaning-best-view-time-october-full-moon" target="_blank" rel="noopener noreferrer">
+            Look up tonight: October’s full moon is for hunters
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Shannon Cudd</span>
+            <span class="score-badge">Score&nbsp;44.9</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">This evening, the night sky is helping to set a spooky mood for the upcoming Halloween festivities later this week. Just after midnight (12:12 a.m. ET on Monday, October 26), the Hunter’s Moon will reach peak illumination. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91628222/nike-after-dark-race-medal-jewelry" target="_blank" rel="noopener noreferrer">
+            This Nike race medal is meant to be worn as jewelry
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Oct 26, 2026 12:00 UTC</span>
+            <span>&bull; Hunter Schwarz</span>
+            <span class="score-badge">Score&nbsp;42.9</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">For its 2026 After Dark Tour, a nighttime race series of 10Ks and half-marathons for women, Nike designed a multipurpose medal that&amp;#8217;s meant to be worn long after race day as a necklace, bracelet, keychain loop, or belt chain. It features a Nike Swoosh and chain adorned with miniature laser-engraved Swooshes that can fit in the palm of your hand. Each comes with a city-specific carabiner for the places where the races take place: London; Shanghai; Los Angeles; Mexico City; Sydney; Manila, Philippines; and Mumbai, India. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for India and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://fortune.com/2026/10/26/biotech-firm-cancer-cure/" target="_blank" rel="noopener noreferrer">
+            Biotech firm Rakuten Medical wants to bring its novel ‘lightsaber’ cancer cure to the U.S.
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fortune</span>
+            <span>Oct 26, 2026 05:10 UTC</span>
+            <span>&bull; Angelica Ang</span>
+            <span class="score-badge">Score&nbsp;31.4</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">In the short-term, the firm is looking to enter markets close to home—including Taiwan, Macau, Singapore, Hong Kong and Saudi Arabia. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.wired.com/story/apple-carplay-and-android-auto-make-your-phone-hot-heres-how-to-keep-it-cool/" target="_blank" rel="noopener noreferrer">
+            Apple CarPlay and Android Auto Make Your Phone Hot. Here’s How to Keep It Cool
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Wired</span>
+            <span>Oct 25, 2026 10:15 UTC</span>
+            <span>&bull; David Nield</span>
+            <span class="score-badge">Score&nbsp;15.2</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Powering a car dashboard is more demanding on your handset than you might think. These tips will save battery life and help your phone chill out. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+
+    <footer>
+      <p>Generated 2026-10-26 12:00 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
+      <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('dm-toggle');
+
+  function applyDark(on) {
+    document.body.classList.toggle('dark-mode', on);
+    btn.textContent = on ? '☀️' : '🌙';
+  }
+
+  // Restore persisted preference
+  try { applyDark(localStorage.getItem('dm') === '1'); } catch (e) {}
+
+  btn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('dark-mode');
+    btn.textContent = on ? '☀️' : '🌙';
+    try { localStorage.setItem('dm', on ? '1' : '0'); } catch (e) {}
+  });
+
+  // Lazy-reveal article cards via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    var cardIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          cardIO.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      cardIO.observe(c);
+    });
+  } else {
+    // Fallback: reveal all cards immediately for older browsers
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      c.classList.add('visible');
+    });
+  }
+
+  // Highlight active sidebar link as user scrolls
+  var sections = document.querySelectorAll('.category-section');
+  var sideLinks = document.querySelectorAll('.sidebar-link');
+  if (sections.length && sideLinks.length && 'IntersectionObserver' in window) {
+    var secIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          sideLinks.forEach(function (l) { l.classList.remove('active'); });
+          var active = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.25 });
+    sections.forEach(function (s) { secIO.observe(s); });
+  }
+})();
+</script>
+
+</body>
+</html>
