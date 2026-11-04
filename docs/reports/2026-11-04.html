@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Financial Digest &ndash; 2026-11-04</title>
+  <style>
+    /* ---- CSS variables: light mode ---- */
+    :root {
+      --navy:      #003366;
+      --red:       #b30000;
+      --bg:        #f5f5f0;
+      --card:      #ffffff;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --border:    #dddddd;
+      --why-bg:    #f0f4f8;
+      --sidebar-bg:#ffffff;
+      --bull-bg:   #e8f5e9; --bull-fg: #2e7d32; --bull-br: #a5d6a7;
+      --bear-bg:   #fce4ec; --bear-fg: #c62828; --bear-br: #ef9a9a;
+      --neut-bg:   #f5f5f5; --neut-fg: #555555; --neut-br: #bdbdbd;
+      --ticker-bg: #eef2f7;
+      --tldr-bg:   #fffbf0;
+      --tldr-br:   #e8a000;
+    }
+    /* ---- Dark mode overrides ---- */
+    body.dark-mode {
+      --navy:      #6eaeff;
+      --red:       #ff7b7b;
+      --bg:        #0f1117;
+      --card:      #1a1d27;
+      --text:      #e2e2e2;
+      --muted:     #8a8a9a;
+      --border:    #2a2d3a;
+      --why-bg:    #1e2235;
+      --sidebar-bg:#151720;
+      --bull-bg:   #1b3a22; --bull-fg: #66bb6a; --bull-br: #2e7d32;
+      --bear-bg:   #3a1a22; --bear-fg: #ef5350; --bear-br: #c62828;
+      --neut-bg:   #252535; --neut-fg: #9090a0; --neut-br: #3a3a50;
+      --ticker-bg: #1a1d2e;
+      --tldr-bg:   #1e1a08;
+      --tldr-br:   #8a6a00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    /* ---- Dark-mode toggle (fixed) ---- */
+    .dm-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background 0.25s, border-color 0.25s;
+      padding: 0;
+      line-height: 1;
+    }
+    .dm-toggle:hover { opacity: 0.85; }
+
+    /* ---- Two-column page grid ---- */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 860px);
+      gap: 2rem;
+      max-width: 1130px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ---- Sticky sidebar ---- */
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .sidebar-nav {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 0.8rem;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .sidebar-heading {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.4rem;
+    }
+    .sidebar-link {
+      display: block;
+      padding: 0.32rem 0.55rem;
+      margin-bottom: 0.1rem;
+      font-size: 0.82rem;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--border); }
+    .sidebar-link.active { background: var(--navy); color: #fff; }
+
+    /* ---- Main content column ---- */
+    .main-content { min-width: 0; }
+
+    /* ---- Header ---- */
+    header {
+      border-bottom: 4px double var(--red);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .digest-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-top: 0.4rem;
+    }
+
+    /* ---- Market data ticker banner ---- */
+    .market-ticker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 0;
+      background: var(--ticker-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 1.4rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      transition: background 0.25s;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.4rem;
+      white-space: nowrap;
+    }
+    .ticker-name  { color: var(--muted); font-size: 0.74rem; }
+    .ticker-price { font-weight: 700; color: var(--text); }
+    .ticker-change { font-weight: 600; font-size: 0.76rem; }
+    .ticker-item.ticker-up   .ticker-change { color: #2e7d32; }
+    .ticker-item.ticker-down .ticker-change { color: #c62828; }
+    body.dark-mode .ticker-item.ticker-up   .ticker-change { color: #66bb6a; }
+    body.dark-mode .ticker-item.ticker-down .ticker-change { color: #ef5350; }
+    .ticker-sep { color: var(--border); padding: 0 0.25rem; user-select: none; }
+
+    /* ---- TL;DR / Today's Brief ---- */
+    .tldr-section {
+      background: var(--tldr-bg);
+      border-left: 5px solid var(--tldr-br);
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.8rem;
+      transition: background 0.25s;
+    }
+    .tldr-label {
+      font-size: 0.64rem;
+      font-family: Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .tldr-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ---- Mobile top-nav pills (hidden on desktop) ---- */
+    .category-nav {
+      display: none;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .category-nav a {
+      background: var(--navy);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.28rem 0.72rem;
+      border-radius: 20px;
+      font-size: 0.80rem;
+      font-family: Arial, sans-serif;
+      transition: background 0.15s;
+    }
+    .category-nav a:hover { background: var(--red); }
+
+    /* ---- Category section ---- */
+    .category-section { margin-bottom: 3rem; }
+    .category-header {
+      font-size: 1.45rem;
+      color: var(--navy);
+      border-left: 5px solid var(--red);
+      padding-left: 0.65rem;
+      margin-bottom: 0.3rem;
+    }
+    .category-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 1.2rem;
+      padding-left: 0.9rem;
+    }
+
+    /* ---- Article card (lazy-reveal via JS) ---- */
+    .article-card {
+      background: var(--card);
+      border-left: 4px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.3rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  background 0.25s, box-shadow 0.25s;
+    }
+    .article-card.visible { opacity: 1; transform: translateY(0); }
+
+    .article-title {
+      font-size: 1.08rem;
+      font-weight: bold;
+      color: var(--navy);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .article-title:hover { text-decoration: underline; color: var(--red); }
+
+    .article-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-bottom: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ---- Source badges ---- */
+    .source-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      letter-spacing: 0.3px;
+    }
+    .source-yahoo       { background: #6001d2; color: #fff; }
+    .source-cnbc        { background: #c00;    color: #fff; }
+    .source-wsj         { background: #003366; color: #fff; }
+    .source-economist   { background: #e3120b; color: #fff; }
+    .source-cnn         { background: #cc0000; color: #fff; }
+    .source-ibd         { background: #e06000; color: #fff; }
+    .source-techcrunch  { background: #0a7d3e; color: #fff; }
+    .source-marketwatch { background: #004b87; color: #fff; }
+    .source-reuters     { background: #ff8000; color: #fff; }
+    .source-other       { background: #555;    color: #fff; }
+
+    /* ---- Score badge ---- */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.68rem;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ---- Sentiment badge ---- */
+    .sentiment-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      border: 1px solid;
+    }
+    .sentiment-bullish { background: var(--bull-bg); color: var(--bull-fg); border-color: var(--bull-br); }
+    .sentiment-bearish { background: var(--bear-bg); color: var(--bear-fg); border-color: var(--bear-br); }
+    .sentiment-neutral { background: var(--neut-bg); color: var(--neut-fg); border-color: var(--neut-br); }
+
+    /* ---- Reading time ---- */
+    .reading-time {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    /* ---- Summary & why-it-matters ---- */
+    .summary {
+      font-size: 0.93rem;
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+    .why-matters {
+      background: var(--why-bg);
+      border-radius: 5px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.87rem;
+      transition: background 0.25s;
+    }
+    .why-matters strong { color: var(--navy); font-family: Arial, sans-serif; }
+    .why-matters ul { margin: 0.3rem 0 0 1.2rem; padding: 0; }
+    .why-matters li { margin-bottom: 0.2rem; }
+
+    /* ---- Shortfall notice ---- */
+    .shortfall-notice {
+      color: var(--red);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px dashed var(--red);
+      border-radius: 4px;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+    footer p { margin-bottom: 0.3rem; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 860px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
+        padding: 1rem 1rem 3rem;
+      }
+      .sidebar { display: none; }
+      .category-nav { display: flex; }
+      .dm-toggle { top: 0.6rem; right: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="dm-toggle" id="dm-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+<div class="page-wrapper">
+
+  <!-- Sticky sidebar (desktop only) -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav" aria-label="Category navigation">
+      <p class="sidebar-heading">Contents</p>
+      
+      <a href="#global" class="sidebar-link">🌍 Global</a>
+      
+      <a href="#market" class="sidebar-link">📈 Market</a>
+      
+      <a href="#stock" class="sidebar-link">🏢 Stock</a>
+      
+      <a href="#tech" class="sidebar-link">💻 Tech</a>
+      
+      <a href="#ai_apps" class="sidebar-link">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia" class="sidebar-link">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio" class="sidebar-link">⭐ Portfolio</a>
+      
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+
+    <header>
+      <h1>Daily Financial Digest</h1>
+      <p class="digest-meta">
+        Wednesday, November 4, 2026 &nbsp;&bull;&nbsp;
+        22 stories across 7 categories &nbsp;&bull;&nbsp;
+        Generated 2026-11-04 13:34 UTC
+      </p>
+    </header>
+
+    
+
+    
+    <div class="tldr-section" role="note" aria-label="Today's brief">
+      <p class="tldr-label">Today&rsquo;s Brief</p>
+      <p class="tldr-text">Democrats’ capture of Congress raise expectations of tougher regulation of AI sector; US stock futures turn positive, reversing earlier declines And Chris Turner , global head of markets at ING, says: Investors will be parsing what this all means, headlining today&#39;s digest. Markets are navigating a mix of macro and corporate developments spanning Global, Market and beyond. Across 22 curated stories today, overall tone is cautious, with bearish pressures weighing on sentiment.</p>
+    </div>
+    
+
+    <!-- Mobile nav pills -->
+    <nav class="category-nav" aria-label="Jump to category">
+      
+      <a href="#global">🌍 Global</a>
+      
+      <a href="#market">📈 Market</a>
+      
+      <a href="#stock">🏢 Stock</a>
+      
+      <a href="#tech">💻 Tech</a>
+      
+      <a href="#ai_apps">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio">⭐ Portfolio</a>
+      
+    </nav>
+
+    
+    <section class="category-section" id="global">
+      <h2 class="category-header">🌍 Global</h2>
+      <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91634937/midterm-voters-decide-key-ballot-measures-putting-trumps-agenda-test" target="_blank" rel="noopener noreferrer">
+            Midterm voters to decide on these key ballot measures, putting Trump’s agenda to the test
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Associated Press</span>
+            <span class="score-badge">Score&nbsp;58.9</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">A battle over abortion rights is playing out in several states Tuesday as voters decide 145 proposed laws and constitutional amendments, including some that could affect voting for future elections. The ballot measures provide a political undercard for a high-profile midterm election that will determine which party controls Congress , state legislatures and gubernatorial offices in many states. Some measures put President Donald Trump&amp;#8217;s priorities to a public test by gauging support for his attempts to reshape congressional districts, limit transgender athletes in sports and strengthen voter identification requirements. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/world/live/2026/nov/04/eu-ukraine-russia-france-germany-us-nato-europe-latest-news" target="_blank" rel="noopener noreferrer">
+            EU to lead talks on support for Ukraine with US, Nato, partners – Europe live
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 04, 2026 13:04 UTC</span>
+            <span>&bull; Jakub Krupa</span>
+            <span class="score-badge">Score&nbsp;53.7</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">3&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">European Commission will hold talks with the US, France, Germany, Britain, Nato, and the World Bank Meanwhile, the Kremlin said that ⁠it ​hopes that the ⁠results of the US ⁠midterm ​elections ‌will not impact ‌what it ‌said were president Donald Trump’s “peacemaking efforts&#34; on Ukraine, Reuters said. In comments ‌broadcast by Russian state ​media, Kremlin spokesperson Dmitry Peskov said: “We ⁠are sincerely ​counting on [Trump] ​continuing ​his peacemaking ​efforts.“ “Governing in the United States will be almost impossible in the coming years given the level of internal division and polarisation. As a European politician I will mainly look of course to trade policies, ⁠support to Ukraine and Nato.” Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91635400/midterm-elections-2026-list-of-historic-firsts-diverse-winners" target="_blank" rel="noopener noreferrer">
+            A night of historic firsts: 2026 midterm election winners set new milestones for diversity and generational change
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Sarah Fielding</span>
+            <span class="score-badge">Score&nbsp;44.9</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Midterm elections often fail to bring the enthusiasm that surrounds a general election, but this was no ordinary year. Americans across the country went to the polls and delivered a significant rebuke of President Trump and candidates who support him. Democrats took back the House and the Senate , flipping long-standing red states like Texas along the way. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for UK and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="market">
+      <h2 class="category-header">📈 Market</h2>
+      <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/business/live/2026/nov/04/dollar-falls-while-gold-us-treasury-bonds-rally-markets-react-democrats-midterm-election-victory-marks-spencer-latest-live-updates" target="_blank" rel="noopener noreferrer">
+            Dollar falls while gold and US Treasury bonds rally as markets react to Democrats’ midterm election victory – business live
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian Business</span>
+            <span>Nov 04, 2026 12:27 UTC</span>
+            <span>&bull; Julia Kollewe</span>
+            <span class="score-badge">Score&nbsp;96.0</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Democrats’ capture of Congress raise expectations of tougher regulation of AI sector; US stock futures turn positive, reversing earlier declines And Chris Turner , global head of markets at ING, says: Investors will be parsing what this all means. For example, Gina Hinojosa won the Texas governor’s race on a ticket of wanting an immediate moratorium on data centre buildouts. Given AI’s role in powering the US economy, speculation over whether a new Democrat Congress would slow AI capital expenditure plans briefly hit markets. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing gold exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91634972/election-day-could-mean-big-things-for-your-401k-heres-what-history-tells-us" target="_blank" rel="noopener noreferrer">
+            Election Day could mean big things for your 401(k). Here’s what history tells us
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Anna-Louise Jackson</span>
+            <span class="score-badge">Score&nbsp;88.0</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Whether or not Tuesday’s midterm elections deliver a so-called blue wave, one thing is for certain: More volatility will likely ripple through financial markets. Midterm years have been historically weak for the U.S. stock market , delivering annual gains of just 7.5% versus an average return of 12.4% during non-midterm years, according to figures compiled by global investment management firm BlackRock . The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing Treasury exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91635116/job-openings-economy-inflation-layoffs" target="_blank" rel="noopener noreferrer">
+            U.S. job postings rose sharply in September
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Associated Press</span>
+            <span class="score-badge">Score&nbsp;77.2</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">U.S. employers ramped up their job postings in September as stronger economic growth may be encouraging more hiring . Yet voters are headed to the polls Tuesday, largely gloomy over an economy beset by higher prices . The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing risk asset exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="stock">
+      <h2 class="category-header">🏢 Stock</h2>
+      <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/business/2026/nov/04/bmw-warns-on-profits-counts-cost-plan-for-8000-job-cuts" target="_blank" rel="noopener noreferrer">
+            BMW warns on profits as it counts cost of plan for 8,000 job cuts
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 04, 2026 11:58 UTC</span>
+            <span>&bull; Lisa O’Carroll</span>
+            <span class="score-badge">Score&nbsp;85.3</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">German carmaker slashes profit margin to between -0.5% and 0.5% this year in face of competition from China The German carmaker BMW has issued its second profit warning in a year, blaming the costs of a restructuring programme including significant job losses in the face of continuing competition from China. The company is the latest to issue a profit downgrade in the German car sector, with Mercedes-Benz last week cutting its profit outlook. Western automakers have struggled to keep pace with lower-cost domestic rivals in China, which has led to reduced sales there and a rise in exports to Europe. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>The company shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Has direct implications for equity and/or bond market pricing.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91635059/hinge-is-making-a-surprising-change-to-its-subscriptions-heres-who-stands-to-benefit" target="_blank" rel="noopener noreferrer">
+            Hinge is making a surprising change to its subscriptions. Here’s who stands to benefit
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; María José Gutiérrez Chávez</span>
+            <span class="score-badge">Score&nbsp;70.9</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Hinge users may soon have access to a more affordable subscription tier. The app’s parent company, Match Group, announced on November 2 that it’s testing a new feature geared toward women. During its third-quarter 2026 earnings call , Match Group said the new tier will give users more control through additional filters and custom location boundaries. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Hinge shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Has direct implications for equity and/or bond market pricing.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91635003/taco-bell-says-it-has-a-magic-formula-for-bringing-customers-back-heres-what-it-is" target="_blank" rel="noopener noreferrer">
+            Taco Bell says it has a ‘magic formula’ for bringing customers back. Here’s what it is
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Jennifer Mattson</span>
+            <span class="score-badge">Score&nbsp;69.5</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Yum Brands, the parent company of Taco Bell , KFC, and The Habit Burger &amp;amp; Grill, reported higher-than-expected third-quarter earnings on Tuesday, driven in part by KFC&amp;#8217;s global expansion and higher revenue from its franchises . However, an outbreak of cyclosporiasis linked to tainted shredded lettuce at Taco Bell, which Yum considers its “ growth engine ,” affected the chain&amp;#8217;s same-store sales, which dropped 4% in the U.S. for the quarter . The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Taco Bell shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="tech">
+      <h2 class="category-header">💻 Tech</h2>
+      <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91634103/meet-the-new-gadgets-designed-to-kill-our-dependence-on-gadgets" target="_blank" rel="noopener noreferrer">
+            Meet the new gadgets designed to kill our dependence on gadgets
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Jesus Diaz</span>
+            <span class="score-badge">Score&nbsp;86.4</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">On our video call, Shreyas Narlanka holds up a 3-inch square screen called Meadow . It looks like a thick, equilateral iPhone 13 mini . It would easily fit in my jeans’ front pocket.&amp;nbsp; I instantly wanted one. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91635413/spacex-tesla-stocks-fall-midterm-elections-markets-rise-why" target="_blank" rel="noopener noreferrer">
+            Markets rise, but SpaceX and Tesla stocks fall, after Dems take back the House and Senate. Here’s why
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Michael Grothaus</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">There’s no two ways about it: Yesterday’s midterm election results were nothing short of a massive victory for the Democrats (a “ blue tsunami, ” indeed). The Democrats will now control both chambers of Congress by a wide margin, radically altering the balance of power in Washington. While change brings uncertainty—and no one likes uncertainty less than investors—stock markets have so far reacted positively to the news. The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91626904/how-likely-are-you-to-be-fired-by-ai" target="_blank" rel="noopener noreferrer">
+            Am I going to be fired by AI? How corporate America is being seduced by AI and algorithms in the ‘forever layoffs’ era
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 04, 2026 13:34 UTC</span>
+            <span>&bull; Pavithra Mohan</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">For five years, the former Meta employee had been feted as a high performer by her managers. She had even received a rare equity award in recognition of her performance, which had never fallen below an “exceeds expectations” rating.&amp;nbsp; Imagine her surprise, then, when she was unceremoniously laid off this past spring. Perhaps she should have seen the writing on the wall. Revised analyst recommendations typically trigger institutional rebalancing and can amplify near-term price moves in the underlying security. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="ai_apps">
+      <h2 class="category-header">🤖 AI_Apps</h2>
+      <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/technology/2026/nov/03/google-search-artificial-intelligence" target="_blank" rel="noopener noreferrer">
+            Google says there’s no way to use Search without using artificial intelligence
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian Technology</span>
+            <span>Nov 03, 2026 20:30 UTC</span>
+            <span>&bull; Johana Bhuiyan</span>
+            <span class="score-badge">Score&nbsp;44.1</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">In announcement geared to schools, tech giant shows how entwined AI is with the world’s most popular website Google just acknowledged that you can’t use Google Search without using artificial intelligence . The search giant announced a slate of new AI products for classrooms and schools on Tuesday as well as more ways for teachers and schools to limit or restrict use of those AI tools. The company said the schools should have control over whether students use AI in the classroom. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/11/03/google-will-let-schools-disable-its-ai-tools-but-not-without-sacrificing-search/" target="_blank" rel="noopener noreferrer">
+            Google will let schools disable its AI tools, but not without sacrificing Search
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Nov 03, 2026 16:30 UTC</span>
+            <span>&bull; Aisha Malik</span>
+            <span class="score-badge">Score&nbsp;26.9</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Schools choosing to restrict AI altogether will no longer be able to access Google Search, as AI features are now integrated into the search engine. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.technologyreview.com/2026/11/03/1147934/reverse-game-theory-mechanism-design-ai-alignment/" target="_blank" rel="noopener noreferrer">
+            How “reverse game theory” could keep AI agents in check
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">MIT Technology Review</span>
+            <span>Nov 03, 2026 10:43 UTC</span>
+            <span>&bull; Amit Katwala</span>
+            <span class="score-badge">Score&nbsp;22.2</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">A new approach known as “reverse game theory” aims to control powerful AI models by designing systems that incentivize them to stick to the rules. As AI models become more capable, safety researchers are scrambling to ensure they are “aligned” with human desires—to make sure, in other words, that rogue agents don’t break the law,&amp;#8230;. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="industry_academia">
+      <h2 class="category-header">🏭 Industry_Academia</h2>
+      <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/11/04/canva-lays-off-over-1200-people-amid-slowing-growth/" target="_blank" rel="noopener noreferrer">
+            Canva lays off over 1,200 people amid slowing growth
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Nov 04, 2026 11:59 UTC</span>
+            <span>&bull; Ivan Mehta</span>
+            <span class="score-badge">Score&nbsp;39.5</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Canva lays off over 1,200 people amid slowing growth. Canva is cutting 22% of its staff as it faces its &#39;hardest year&#39; yet. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.trefis.com/stock/vrt/articles/622596/how-has-vertivs-story-changed/2026-11-04" target="_blank" rel="noopener noreferrer">
+            How Has Vertiv&#39;s Story Changed?
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-yahoo">Yahoo Finance</span>
+            
+            <span>Nov 04, 2026 11:53 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;36.8</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">1&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">How Has Vertiv&#39;s Story Changed?. For questions about this article or underlying research, email help@trefis.com. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/11/02/web-host-squarespace-lays-off-19-of-its-employees/" target="_blank" rel="noopener noreferrer">
+            Web host Squarespace lays off 19% of its employees
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Nov 02, 2026 19:25 UTC</span>
+            <span>&bull; Lucas Ropek</span>
+            <span class="score-badge">Score&nbsp;24.1</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">The website builder said that the job losses are part of a broader restructuring of its organization. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="portfolio">
+      <h2 class="category-header">⭐ Portfolio</h2>
+      <p class="category-desc">Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/australia-news/2026/nov/04/alan-jones-trial-kate-mcclymont-nail-in-coffin-ntwnfb" target="_blank" rel="noopener noreferrer">
+            Kate McClymont questioned over ‘nail in the coffin’ and poo emoji texts at Alan Jones trial
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 04, 2026 06:23 UTC</span>
+            <span>&bull; Amanda Meade Media correspondent</span>
+            <span class="score-badge">Score&nbsp;30.9</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">3&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Award-winning investigative journalist says she ‘probably’ texted an alleged victim’s mother saying ‘I hope the shit does hit the fan for him’, court hears Get our breaking news email , free app or daily news podcast Investigative journalist Kate McClymont has told a Sydney court that an audio recording in which she said new information would be “an absolute nail in the coffin” did not refer to “killing” Alan Jones. In a phone call with the mother of the youngest alleged victim of Jones, which was played in court, the Sydney Morning Herald’s chief investigative reporter expressed excitement when the woman said her son had spoken to police in the same year as the alleged assault. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.bbc.co.uk/news/articles/cwz0v5lv30lyo" target="_blank" rel="noopener noreferrer">
+            Anthony Zurcher: Democrats push deep into Trump heartland on historic night
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">BBC World</span>
+            <span>Nov 04, 2026 06:53 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;28.1</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Two Senate races that a year ago were thought to be battlegrounds turned out to be slam-dunks for the Democrats. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fool.com/investing/2026/11/03/honeywell-aerospace-vs-ge-aerospace-which-pure-pla/" target="_blank" rel="noopener noreferrer">
+            Honeywell Aerospace vs. GE Aerospace: Which Pure-Play Aerospace Stock Is the Better Buy Now That Both Stand Alone?
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-yahoo">Yahoo Finance</span>
+            
+            <span>Nov 04, 2026 03:35 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;25.2</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">One looks like it has hit the ground running, while the other is still trying to get its footing. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://finance.yahoo.com/healthcare/articles/corning-glw-doing-3d-cell-171532521.html" target="_blank" rel="noopener noreferrer">
+            What Is Corning (GLW) Doing In 3D Cell Culture And Cell Harvesting?
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-yahoo">Yahoo Finance</span>
+            
+            <span>Nov 03, 2026 17:15 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;20.5</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Corning (NYSE:GLW) is cited as a key leader in global 3D cell culture and automated cell harvesting markets. The company&#39;s technologies are being used to improve drug discovery workflows and biopharmaceutical manufacturing processes. Corning&#39;s work in 3D cell culture and automated cell harvesting could broaden its role in the life sciences sector. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+
+    <footer>
+      <p>Generated 2026-11-04 13:34 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
+      <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('dm-toggle');
+
+  function applyDark(on) {
+    document.body.classList.toggle('dark-mode', on);
+    btn.textContent = on ? '☀️' : '🌙';
+  }
+
+  // Restore persisted preference
+  try { applyDark(localStorage.getItem('dm') === '1'); } catch (e) {}
+
+  btn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('dark-mode');
+    btn.textContent = on ? '☀️' : '🌙';
+    try { localStorage.setItem('dm', on ? '1' : '0'); } catch (e) {}
+  });
+
+  // Lazy-reveal article cards via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    var cardIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          cardIO.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      cardIO.observe(c);
+    });
+  } else {
+    // Fallback: reveal all cards immediately for older browsers
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      c.classList.add('visible');
+    });
+  }
+
+  // Highlight active sidebar link as user scrolls
+  var sections = document.querySelectorAll('.category-section');
+  var sideLinks = document.querySelectorAll('.sidebar-link');
+  if (sections.length && sideLinks.length && 'IntersectionObserver' in window) {
+    var secIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          sideLinks.forEach(function (l) { l.classList.remove('active'); });
+          var active = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.25 });
+    sections.forEach(function (s) { secIO.observe(s); });
+  }
+})();
+</script>
+
+</body>
+</html>
