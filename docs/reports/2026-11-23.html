@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Financial Digest &ndash; 2026-11-23</title>
+  <style>
+    /* ---- CSS variables: light mode ---- */
+    :root {
+      --navy:      #003366;
+      --red:       #b30000;
+      --bg:        #f5f5f0;
+      --card:      #ffffff;
+      --text:      #1a1a1a;
+      --muted:     #666666;
+      --border:    #dddddd;
+      --why-bg:    #f0f4f8;
+      --sidebar-bg:#ffffff;
+      --bull-bg:   #e8f5e9; --bull-fg: #2e7d32; --bull-br: #a5d6a7;
+      --bear-bg:   #fce4ec; --bear-fg: #c62828; --bear-br: #ef9a9a;
+      --neut-bg:   #f5f5f5; --neut-fg: #555555; --neut-br: #bdbdbd;
+      --ticker-bg: #eef2f7;
+      --tldr-bg:   #fffbf0;
+      --tldr-br:   #e8a000;
+    }
+    /* ---- Dark mode overrides ---- */
+    body.dark-mode {
+      --navy:      #6eaeff;
+      --red:       #ff7b7b;
+      --bg:        #0f1117;
+      --card:      #1a1d27;
+      --text:      #e2e2e2;
+      --muted:     #8a8a9a;
+      --border:    #2a2d3a;
+      --why-bg:    #1e2235;
+      --sidebar-bg:#151720;
+      --bull-bg:   #1b3a22; --bull-fg: #66bb6a; --bull-br: #2e7d32;
+      --bear-bg:   #3a1a22; --bear-fg: #ef5350; --bear-br: #c62828;
+      --neut-bg:   #252535; --neut-fg: #9090a0; --neut-br: #3a3a50;
+      --ticker-bg: #1a1d2e;
+      --tldr-bg:   #1e1a08;
+      --tldr-br:   #8a6a00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.25s, color 0.25s;
+    }
+
+    /* ---- Dark-mode toggle (fixed) ---- */
+    .dm-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      transition: background 0.25s, border-color 0.25s;
+      padding: 0;
+      line-height: 1;
+    }
+    .dm-toggle:hover { opacity: 0.85; }
+
+    /* ---- Two-column page grid ---- */
+    .page-wrapper {
+      display: grid;
+      grid-template-columns: 210px minmax(0, 860px);
+      gap: 2rem;
+      max-width: 1130px;
+      margin: 0 auto;
+      padding: 2rem 1rem 4rem;
+    }
+
+    /* ---- Sticky sidebar ---- */
+    .sidebar {
+      align-self: start;
+      position: sticky;
+      top: 1.5rem;
+    }
+    .sidebar-nav {
+      background: var(--sidebar-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.9rem 0.8rem;
+      transition: background 0.25s, border-color 0.25s;
+    }
+    .sidebar-heading {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+      padding-left: 0.4rem;
+    }
+    .sidebar-link {
+      display: block;
+      padding: 0.32rem 0.55rem;
+      margin-bottom: 0.1rem;
+      font-size: 0.82rem;
+      font-family: Arial, sans-serif;
+      color: var(--text);
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .sidebar-link:hover { background: var(--border); }
+    .sidebar-link.active { background: var(--navy); color: #fff; }
+
+    /* ---- Main content column ---- */
+    .main-content { min-width: 0; }
+
+    /* ---- Header ---- */
+    header {
+      border-bottom: 4px double var(--red);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      color: var(--navy);
+      letter-spacing: 0.02em;
+    }
+    .digest-meta {
+      font-size: 0.88rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-top: 0.4rem;
+    }
+
+    /* ---- Market data ticker banner ---- */
+    .market-ticker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 0;
+      background: var(--ticker-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      margin-bottom: 1.4rem;
+      font-family: Arial, sans-serif;
+      font-size: 0.82rem;
+      transition: background 0.25s;
+    }
+    .ticker-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.15rem 0.4rem;
+      white-space: nowrap;
+    }
+    .ticker-name  { color: var(--muted); font-size: 0.74rem; }
+    .ticker-price { font-weight: 700; color: var(--text); }
+    .ticker-change { font-weight: 600; font-size: 0.76rem; }
+    .ticker-item.ticker-up   .ticker-change { color: #2e7d32; }
+    .ticker-item.ticker-down .ticker-change { color: #c62828; }
+    body.dark-mode .ticker-item.ticker-up   .ticker-change { color: #66bb6a; }
+    body.dark-mode .ticker-item.ticker-down .ticker-change { color: #ef5350; }
+    .ticker-sep { color: var(--border); padding: 0 0.25rem; user-select: none; }
+
+    /* ---- TL;DR / Today's Brief ---- */
+    .tldr-section {
+      background: var(--tldr-bg);
+      border-left: 5px solid var(--tldr-br);
+      border-radius: 0 8px 8px 0;
+      padding: 0.85rem 1.15rem;
+      margin-bottom: 1.8rem;
+      transition: background 0.25s;
+    }
+    .tldr-label {
+      font-size: 0.64rem;
+      font-family: Arial, sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+    .tldr-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text);
+    }
+
+    /* ---- Mobile top-nav pills (hidden on desktop) ---- */
+    .category-nav {
+      display: none;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+    .category-nav a {
+      background: var(--navy);
+      color: #fff;
+      text-decoration: none;
+      padding: 0.28rem 0.72rem;
+      border-radius: 20px;
+      font-size: 0.80rem;
+      font-family: Arial, sans-serif;
+      transition: background 0.15s;
+    }
+    .category-nav a:hover { background: var(--red); }
+
+    /* ---- Category section ---- */
+    .category-section { margin-bottom: 3rem; }
+    .category-header {
+      font-size: 1.45rem;
+      color: var(--navy);
+      border-left: 5px solid var(--red);
+      padding-left: 0.65rem;
+      margin-bottom: 0.3rem;
+    }
+    .category-desc {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: italic;
+      margin-bottom: 1.2rem;
+      padding-left: 0.9rem;
+    }
+
+    /* ---- Article card (lazy-reveal via JS) ---- */
+    .article-card {
+      background: var(--card);
+      border-left: 4px solid var(--red);
+      border-radius: 0 6px 6px 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      padding: 1.1rem 1.4rem;
+      margin-bottom: 1.3rem;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s ease,
+                  background 0.25s, box-shadow 0.25s;
+    }
+    .article-card.visible { opacity: 1; transform: translateY(0); }
+
+    .article-title {
+      font-size: 1.08rem;
+      font-weight: bold;
+      color: var(--navy);
+      text-decoration: none;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+    .article-title:hover { text-decoration: underline; color: var(--red); }
+
+    .article-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+      margin-bottom: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    /* ---- Source badges ---- */
+    .source-badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      font-family: Arial, sans-serif;
+      border-radius: 3px;
+      padding: 0.1rem 0.4rem;
+      letter-spacing: 0.3px;
+    }
+    .source-yahoo       { background: #6001d2; color: #fff; }
+    .source-cnbc        { background: #c00;    color: #fff; }
+    .source-wsj         { background: #003366; color: #fff; }
+    .source-economist   { background: #e3120b; color: #fff; }
+    .source-cnn         { background: #cc0000; color: #fff; }
+    .source-ibd         { background: #e06000; color: #fff; }
+    .source-techcrunch  { background: #0a7d3e; color: #fff; }
+    .source-marketwatch { background: #004b87; color: #fff; }
+    .source-reuters     { background: #ff8000; color: #fff; }
+    .source-other       { background: #555;    color: #fff; }
+
+    /* ---- Score badge ---- */
+    .score-badge {
+      display: inline-flex;
+      align-items: center;
+      background: var(--navy);
+      color: #fff;
+      font-size: 0.68rem;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      font-family: Arial, sans-serif;
+    }
+
+    /* ---- Sentiment badge ---- */
+    .sentiment-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      font-weight: 600;
+      border-radius: 10px;
+      padding: 0.1rem 0.45rem;
+      border: 1px solid;
+    }
+    .sentiment-bullish { background: var(--bull-bg); color: var(--bull-fg); border-color: var(--bull-br); }
+    .sentiment-bearish { background: var(--bear-bg); color: var(--bear-fg); border-color: var(--bear-br); }
+    .sentiment-neutral { background: var(--neut-bg); color: var(--neut-fg); border-color: var(--neut-br); }
+
+    /* ---- Reading time ---- */
+    .reading-time {
+      font-size: 0.68rem;
+      font-family: Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    /* ---- Summary & why-it-matters ---- */
+    .summary {
+      font-size: 0.93rem;
+      line-height: 1.65;
+      margin-bottom: 0.75rem;
+    }
+    .why-matters {
+      background: var(--why-bg);
+      border-radius: 5px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.87rem;
+      transition: background 0.25s;
+    }
+    .why-matters strong { color: var(--navy); font-family: Arial, sans-serif; }
+    .why-matters ul { margin: 0.3rem 0 0 1.2rem; padding: 0; }
+    .why-matters li { margin-bottom: 0.2rem; }
+
+    /* ---- Shortfall notice ---- */
+    .shortfall-notice {
+      color: var(--red);
+      font-style: italic;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.8rem;
+      border: 1px dashed var(--red);
+      border-radius: 4px;
+    }
+
+    /* ---- Footer ---- */
+    footer {
+      margin-top: 3rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: Arial, sans-serif;
+    }
+    footer p { margin-bottom: 0.3rem; }
+
+    /* ---- Responsive ---- */
+    @media (max-width: 860px) {
+      .page-wrapper {
+        grid-template-columns: 1fr;
+        padding: 1rem 1rem 3rem;
+      }
+      .sidebar { display: none; }
+      .category-nav { display: flex; }
+      .dm-toggle { top: 0.6rem; right: 0.6rem; }
+    }
+  </style>
+</head>
+<body>
+
+<button class="dm-toggle" id="dm-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+<div class="page-wrapper">
+
+  <!-- Sticky sidebar (desktop only) -->
+  <aside class="sidebar">
+    <nav class="sidebar-nav" aria-label="Category navigation">
+      <p class="sidebar-heading">Contents</p>
+      
+      <a href="#global" class="sidebar-link">🌍 Global</a>
+      
+      <a href="#market" class="sidebar-link">📈 Market</a>
+      
+      <a href="#stock" class="sidebar-link">🏢 Stock</a>
+      
+      <a href="#tech" class="sidebar-link">💻 Tech</a>
+      
+      <a href="#ai_apps" class="sidebar-link">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia" class="sidebar-link">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio" class="sidebar-link">⭐ Portfolio</a>
+      
+    </nav>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main-content">
+
+    <header>
+      <h1>Daily Financial Digest</h1>
+      <p class="digest-meta">
+        Monday, November 23, 2026 &nbsp;&bull;&nbsp;
+        19 stories across 7 categories &nbsp;&bull;&nbsp;
+        Generated 2026-11-23 16:59 UTC
+      </p>
+    </header>
+
+    
+
+    
+    <div class="tldr-section" role="note" aria-label="Today's brief">
+      <p class="tldr-label">Today&rsquo;s Brief</p>
+      <p class="tldr-text">Two cybersecurity companies are coming together in one of the industry’s biggest ever mergers, headlining today&#39;s digest. Analyst revisions are influencing positioning across Global, Market categories. Across 19 curated stories today, overall tone is cautious, with bearish pressures weighing on sentiment.</p>
+    </div>
+    
+
+    <!-- Mobile nav pills -->
+    <nav class="category-nav" aria-label="Jump to category">
+      
+      <a href="#global">🌍 Global</a>
+      
+      <a href="#market">📈 Market</a>
+      
+      <a href="#stock">🏢 Stock</a>
+      
+      <a href="#tech">💻 Tech</a>
+      
+      <a href="#ai_apps">🤖 AI_Apps</a>
+      
+      <a href="#industry_academia">🏭 Industry_Academia</a>
+      
+      <a href="#portfolio">⭐ Portfolio</a>
+      
+    </nav>
+
+    
+    <section class="category-section" id="global">
+      <h2 class="category-header">🌍 Global</h2>
+      <p class="category-desc">International politics, global economy, trade, geopolitics, foreign policy, diplomatic relations, international organisations</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91646498/the-spy-who-loved-change-what-james-bond-can-teach-brands-about-the-art-of-reinvention-james-bond-branding-reinvention" target="_blank" rel="noopener noreferrer">
+            The spy who loved change: What James Bond can teach brands about the art of reinvention
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Emma Barratt</span>
+            <span class="score-badge">Score&nbsp;73.3</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">The greatest strength of the James Bond brand isn&amp;#8217;t its consistency. It&amp;#8217;s its ability to reinvent itself while remaining unmistakably Bond. With Robert Pattinson confirmed as the next 007, the debate has inevitably turned to whether he&amp;#8217;s the right man for the role . The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Russia and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/world/live/2026/nov/23/russia-ukraine-war-zelenskyy-libya-benghazi-drone-attack-ship-merkury-un-nato-europe-latest-news-updates" target="_blank" rel="noopener noreferrer">
+            EU sanctions package intended to ‘keep pressure’ on Russia and ‘strike harder’ at its ability to fund Ukraine war – Europe live
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 23, 2026 16:42 UTC</span>
+            <span>&bull; Jakub Krupa (now) and Yohannes Lowe (earlier)</span>
+            <span class="score-badge">Score&nbsp;69.5</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">European Commission president Ursula von der Leyen sets out 22nd package of sanctions Turning to Ukraine, Nato’s Rutte stresses the need to secure the flow of “crucial supplies” or air defence weapons and ammunition to Ukraine. “ It helps Ukraine to defend itself today, but it also strengthens Ukraine’s hands in any future negotiations with Russia. … But support needs to be concrete. The development comes amid heightened global tensions and could affect trade flows, energy markets, and investor risk sentiment in the near term. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Europe and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91627746/the-conversation-youre-avoiding-is-already-costing-you-leadership-corporate-conversations" target="_blank" rel="noopener noreferrer">
+            The conversation you’re avoiding is already costing you
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Bruce Mayhew</span>
+            <span class="score-badge">Score&nbsp;61.1</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">It’s 2 a.m., and a capable leader is wide awake. In their mind, they&amp;#8217;re replaying a difficult conversation that hasn’t happened yet. They’ve been waiting for the “perfect time”: a calmer week, a better mood, the right moment. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="market">
+      <h2 class="category-header">📈 Market</h2>
+      <p class="category-desc">Equity indexes, interest rates, bonds, foreign exchange, commodities, macro asset moves, ETFs, futures</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91647455/this-one-your-kitchens-hardest-working-tools-heres-how-keep-food-safe" target="_blank" rel="noopener noreferrer">
+            This is one of your kitchen’s hardest working tools. Here’s how to keep it food safe
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Associated Press</span>
+            <span class="score-badge">Score&nbsp;73.8</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">The cutting board might be the hardest working tool in the kitchen yet one thought about least. It takes the raw chicken, then the onions, then sometimes the bread, and in between it typically gets a quick swipe with the nearest sponge. If cutting boards are given a second thought, it&amp;#8217;s usually in the debate over whether to use wood or plastic. Revised analyst recommendations typically trigger institutional rebalancing and can amplify near-term price moves in the underlying security. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing oil exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91646683/the-first-3d-printer-in-space-made-a-wrench-it-could-help-humans-live-on-the-moon" target="_blank" rel="noopener noreferrer">
+            NASA’s first 3D printer in space made a wrench. It could help us live on the moon
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Rob Pegoraro</span>
+            <span class="score-badge">Score&nbsp;73.1</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">One of the newest items to go on display in the National Air and Space Museum in downtown Washington is also one of its most unassuming: a metal box with a glass door on one side , tucked inside a display case dominated by a humanoid robot with arms extended toward the viewer. A small white wrench standing next to that box could be even easier to overlook. But the wrench was made in that box—a 3D printer developed by Made in Space and flown to the International Space Station as the world’s first experiment in 3D printing while in orbit . Revised analyst recommendations typically trigger institutional rebalancing and can amplify near-term price moves in the underlying security.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing euro exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91645679/los-angeles-freeway-worlds-largest-wildlife-bridge" target="_blank" rel="noopener noreferrer">
+            How a Los Angeles freeway became home to the world’s largest wildlife bridge
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Adele Peters</span>
+            <span class="score-badge">Score&nbsp;65.2</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">How do you design a bridge that a mountain lion mistakes for a hillside? That’s the design challenge behind the massive new Annenberg Wildlife Crossing , which stretches across 10 lanes of the 101 freeway northwest of Los Angeles. The crossing—the largest of its kind in the world—won’t officially open until December 2, and even after that point, some construction and habitat restoration will still be underway around the main structure. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Moves the needle on rate expectations and influences cross-asset positioning from equities to bonds.</li>
+              
+              <li>Traders are repricing oil exposure in response to the latest macro data.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="stock">
+      <h2 class="category-header">🏢 Stock</h2>
+      <p class="category-desc">Single-company developments, earnings reports, analyst upgrades/downgrades, M&amp;A, IPOs, CEO changes, product launches</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91647412/crowdstrike-is-buying-zscaler-to-create-a-cybersecurity-giant-built-for-the-era-of-ai-agents" target="_blank" rel="noopener noreferrer">
+            CrowdStrike is buying Zscaler to create a cybersecurity giant built for the era of AI agents
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Sarah Fielding</span>
+            <span class="score-badge">Score&nbsp;86.4</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Two cybersecurity companies are coming together in one of the industry’s biggest ever mergers. On Monday, November 23, CrowdStrike announced that it will purchase Zscaler in an all-stock deal. The transaction values Zscaler at a whopping $43.9 billion, with the company’s shareholders getting 1.135 CrowdStrike common shares (Nasdaq: CRWD) for each Zscaler share (Nasdaq: ZS) they own.&amp;nbsp;&amp;nbsp; “Security used to be about keeping the adversary out. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Crowd shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://247wallst.com/videos/jensen-huang-returns-to-nvida-why-apple-broadcom-and-anthropic-could-be-under-pressure/" target="_blank" rel="noopener noreferrer">
+            Jensen Huang Returns to NVIDA. Why Apple, Broadcom, and Anthropic Could Be Under Pressure
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-yahoo">Yahoo Finance</span>
+            
+            <span>Nov 23, 2026 15:52 UTC</span>
+            
+            <span class="score-badge">Score&nbsp;86.4</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Eric Bleeker, Chief Investment Officer of 24/7 Wall St., says Jensen Huang&#39;s return as CEO of NVIDIA (NASDAQ: NVDA) sent stocks sharply higher on Monday morning. NVIDIA shares opened up 34% at about $170, restoring more than $1 trillion of value to shareholders. The NASDAQ rose about 6.75% and the S&amp;P 500 about 4.6%, erasing much of Friday&#39;s sell-off. The deal, if completed, would reshape competitive dynamics in the industry and faces regulatory scrutiny in multiple jurisdictions. The story originated from the WSJ portfolio section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Jensen Huang shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/us-news/live/2026/nov/23/donald-trump-democrats-republicans-presidential-primary-midterms-house-latest-news-updates" target="_blank" rel="noopener noreferrer">
+            Trump says he spoke to Nvidia board directly about Jensen Huang and insists CEO’s return doesn’t pose a national security risk – live
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 23, 2026 16:48 UTC</span>
+            <span>&bull; Lucy Campbell (now) and Tom Ambrose (earlier)</span>
+            <span class="score-badge">Score&nbsp;79.2</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">US president praises Nvidia’s reinstatement of Jensen Huang as CEO, calling it ‘the correct and proper decision’ Nvidia shares surge 33% on Huang‘s return – business live Sign up to the Breaking News US email Nvidia ’s shares have surged by 31% at the start of trading following the news. The S+P 500 jumped 4.5% and is recovering nearly half of its brutal losses from last week, which was one of its worst since the 2008 financial crisis. Rallies for AI stocks had the Nasdaq composite up a market-leading 6.5%, while the Dow Jones Industrial Average rose 1,117 points. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Trump shares are likely to see elevated volume as investors digest the news and reassess valuations.</li>
+              
+              <li>Analyst price targets and buy/sell ratings will be under review following this development.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="tech">
+      <h2 class="category-header">💻 Tech</h2>
+      <p class="category-desc">Artificial intelligence, semiconductors, software, cloud computing, platforms, hardware, tech regulation and policy</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91647421/tech-stocks-up-today-nvidia-amazon-spacex-will-rebound-last" target="_blank" rel="noopener noreferrer">
+            Nvidia stock soars on stunning news of Jensen Huang’s return, leading a market rebound for AI giants
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Michael Grothaus</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Update Monday, 9:40 a.m.: Shares of Nvidia Corporation soared more than 30% on Monday after the company&amp;#8217;s board of directors announced that founder Jensen Huang would return as CEO. The surprise announcement comes less than two weeks after Huang was ousted over his relationship with an alleged Chinese spy, a scandal that rattled markets as investors pondered the uncertain future of a semiconductor giant at the center of the AI boom. Jensen&amp;#8217;s reinstatement is &amp;#8220;effective immediately,&amp;#8221; Nvidia said. The public offering will test investor appetite and provide a market valuation benchmark for comparable private-sector peers. The story originated from the WSJ business section.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91645300/the-midterm-elections-revealed-an-ai-backlash-heres-what-it-means-for-ceos" target="_blank" rel="noopener noreferrer">
+            The midterm elections revealed an AI backlash. Here’s what it means for CEOs
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Stephanie Mehta</span>
+            <span class="score-badge">Score&nbsp;84.8</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Hello and welcome to Modern CEO ! I’m Stephanie Mehta, CEO and chief content officer of Mansueto Ventures. Each week this newsletter explores inclusive approaches to leadership drawn from conversations with executives and entrepreneurs, and from the pages of Inc. The results reflect the company&#39;s performance against analyst expectations and will shape near-term guidance assumptions for the sector. The story originated from the WSJ business section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.fastcompany.com/91647524/why-nvidia-brought-jensen-huang-back-as-ceo-despite-his-scandals" target="_blank" rel="noopener noreferrer">
+            Why Nvidia brought Jensen Huang back as CEO despite his scandals
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Fast Company</span>
+            <span>Nov 23, 2026 16:59 UTC</span>
+            <span>&bull; Chris Stokel-Walker</span>
+            <span class="score-badge">Score&nbsp;81.6</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">It took just 11 days for Nvidia to reverse course on Jensen Huang, its totemic CEO, who is returning to his position as president and CEO, as well as a member of the board. The decision also appears to have received the White House&amp;#8217;s tacit approval, according to Nvidia&amp;#8217;s surprise announcement of Huang&amp;#8217;s return. That&amp;#8217;s despite an ongoing independent investigation into whether Huang was targeted by Chinese intelligence through a woman with whom he has acknowledged having an affair. Revised analyst recommendations typically trigger institutional rebalancing and can amplify near-term price moves in the underlying security. The story originated from the WSJ business section.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Signals a potential shift in the competitive landscape for AI, with ramifications for adjacent platforms.</li>
+              
+              <li>Regulatory implications could ripple across the broader technology industry and investor sentiment.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="ai_apps">
+      <h2 class="category-header">🤖 AI_Apps</h2>
+      <p class="category-desc">New AI tools, products, model releases, and applications across all industries</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.wired.com/story/states-sue-spacex-over-grok-deepfakes/" target="_blank" rel="noopener noreferrer">
+            States Sue SpaceX Over Grok Deepfakes
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">Wired</span>
+            <span>Nov 23, 2026 11:00 UTC</span>
+            <span>&bull; Maddy Varner</span>
+            <span class="score-badge">Score&nbsp;26.3</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">The attorneys general of Oregon and Virginia are suing several of Elon Musk’s companies, alleging they implemented weak safeguards against sexualized imagery of real people, including children. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="industry_academia">
+      <h2 class="category-header">🏭 Industry_Academia</h2>
+      <p class="category-desc">Mass layoffs, corporate restructuring, academic research breakthroughs, industry shifts</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/us-news/2026/nov/23/cranberry-growing-climate-crisis" target="_blank" rel="noopener noreferrer">
+            Cranberry jam: warming winters and extreme weather threaten an iconic holiday fruit
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 23, 2026 15:00 UTC</span>
+            <span>&bull; Ben Tracy of Climate Central</span>
+            <span class="score-badge">Score&nbsp;40.4</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Scientists are racing to identify and breed new berry varieties that can thrive on an increasingly warmer planet It is harvest time in rural Wisconsin , and the Badger state’s most vibrant crop is painting the rolling countryside a brilliant, unmistakable red. For nearly three decades, Nicole Hansen has been farming cranberries here. Wisconsin produces more than 60% of the nation’s supply. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ world section. Markets and policymakers are watching developments closely for further clarity.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/news/2026/nov/22/bank-of-england-directors-illegally-profited-enslavement-cuba" target="_blank" rel="noopener noreferrer">
+            Bank of England directors illegally profited from post-abolition enslavement in Cuba
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 22, 2026 08:00 UTC</span>
+            <span>&bull; Chris Osuh Community affairs correspondent</span>
+            <span class="score-badge">Score&nbsp;16.6</span>
+            
+            <span class="sentiment-badge sentiment-bullish">&#x1F7E2; Bullish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">New research finds that the British-led Cobre Mining Company helped industrialise Manchester via copper deposits and enslaved African people • Slave-trade wealth was embedded in Britain’s financial system, research finds British businesses run by long-serving directors of the Bank of England profited from “brutal” enslavement in Cuba for decades after slavery’s abolition in the British empire, according to research. Men and boys were enslaved in prison conditions at the El Cobre copper ore mine near Santiago de Cuba, which supplied British firms during the Industrial Revolution, the historian Chris Evans has found. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Africa and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+    <section class="category-section" id="portfolio">
+      <h2 class="category-header">⭐ Portfolio</h2>
+      <p class="category-desc">Personal watchlist: Oracle (ORCL) · Quantum Computing (QUBT) · Broadcom (AVGO) · Eaton (ETN) · Honeywell (HON) · Corning (GLW) · AXT Inc (AXTI)</p>
+
+      
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/uk-news/2026/nov/23/ian-huntley-killed-by-inmate-court-trial" target="_blank" rel="noopener noreferrer">
+            Ian Huntley killer felt ‘sick of him’ and that he had nothing to lose, court told
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 23, 2026 16:34 UTC</span>
+            <span>&bull; Mark Brown North of England correspondent</span>
+            <span class="score-badge">Score&nbsp;41.3</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Jurors hear inmate Anthony Russell bludgeoned Soham murderer with metal bar after being bullied by him A prisoner thought he had nothing to lose when he killed the Soham murderer, Ian Huntley by repeatedly striking him over the head with a 4kg iron bar, a court has heard. Anthony Russell, 44, who is serving a whole-life term at HMP Frankland in Durham, told prison staff Huntley had been bullying him and that he had had enough. Continue reading. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ world section.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://techcrunch.com/2026/11/23/uber-now-lets-you-book-rides-that-record-the-drive-by-default/" target="_blank" rel="noopener noreferrer">
+            Uber now lets you book rides that record the drive by default
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-techcrunch">TechCrunch</span>
+            
+            <span>Nov 23, 2026 14:00 UTC</span>
+            <span>&bull; Ivan Mehta</span>
+            <span class="score-badge">Score&nbsp;36.1</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Uber is piloting a new feature in the U.S. that offers rides in which drivers have enabled the company&amp;#8217;s recording feature, Record My Ride. The option, which uses the front camera of the Uber driver&amp;#8217;s phone to record the entire drive, will show up as &amp;#8220;Recorded Rides&amp;#8221; in the app. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes. The story originated from the WSJ tech section. Markets and policymakers are watching developments closely for further clarity. Analysts note that the full implications may take time to materialise. Investors are advised to monitor follow-up reporting for additional details.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for U.S. and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/australia-news/2026/nov/23/constitutional-law-expert-brands-defence-bill-allowing-secret-security-rules-lazy-and-irresponsible" target="_blank" rel="noopener noreferrer">
+            Constitutional law expert brands defence bill allowing secret security rules ‘lazy and irresponsible’
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian World</span>
+            <span>Nov 23, 2026 08:23 UTC</span>
+            <span>&bull; Josh Butler</span>
+            <span class="score-badge">Score&nbsp;32.4</span>
+            
+            <span class="sentiment-badge sentiment-bearish">&#x1F534; Bearish</span>
+            
+            <span class="reading-time">3&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">Anne Twomey says lack of proper debate around bill is ‘flabbergasting’ amid concerns over extension of ministerial powers Get our daily political email , free app or daily news podcast Labor’s new defence bill is “lazy and irresponsible” lawmaking, one of Australia’s leading constitutional scholars has warned, claiming provisions for the government to secretly class any facility as a special security zone could raise serious legal issues. The prime minister, Anthony Albanese, claimed on Monday that critics of the “accelerating capability and protecting bases” bill were “jump[ing] at shadows”, accusing them of “absurd” claims. But parliamentary crossbenchers opposed to the bill, which was rushed through parliament with little public scrutiny, were joined on Monday by Prof Anne Twomey, who expressed alarm about what she called an increasing trend of ministers exercising discretionary powers without parliamentary oversight.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for Australia and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+        <div class="article-card">
+          <a class="article-title" href="https://www.theguardian.com/thefilter/2026/nov/22/best-christmas-gifts-every-generation-uk" target="_blank" rel="noopener noreferrer">
+            ‘A Nintendo Switch – yes, I know I’m 67’: the best gifts for every generation, picked by real people aged 2 to 103
+          </a>
+          <div class="article-meta">
+            
+            <span class="source-badge source-other">The Guardian Technology</span>
+            <span>Nov 22, 2026 07:00 UTC</span>
+            <span>&bull; Lucy Pavia</span>
+            <span class="score-badge">Score&nbsp;12.1</span>
+            
+            <span class="sentiment-badge sentiment-neutral">&#x26AA; Neutral</span>
+            
+            <span class="reading-time">2&nbsp;min&nbsp;read</span>
+          </div>
+          <p class="summary">We asked everyone from gen Alpha preschoolers to retired boomers, celebs and Guardian writers what’s on their gift list this year – here’s what they said • The best Christmas gifts for 2026 How old are you, and what would you like for Christmas? That’s normally a question reserved for children visiting Santa’s grotto, but it’s one we put to hundreds of you of all ages to see what different generations have on their gift lists. The results may just help you hone your approach to present buying across generations this Christmas, or at least offer an insight into the tastes of each group. The development is being closely monitored by investors and policymakers for potential second-order effects on related sectors and asset classes.</p>
+          <div class="why-matters">
+            <strong>Why it matters:</strong>
+            <ul>
+              
+              <li>Shapes the geopolitical backdrop for global markets and could influence trade flows and currency markets.</li>
+              
+              <li>Central banks and governments will be watching for second-order economic effects on growth and inflation.</li>
+              
+            </ul>
+          </div>
+        </div>
+        
+      
+    </section>
+    
+
+    <footer>
+      <p>Generated 2026-11-23 16:59 UTC &bull; Sources: Yahoo Finance &bull; CNBC &bull; CNN &bull; The Economist &bull; TechCrunch &bull; MarketWatch &bull; Reuters</p>
+      <p>This digest summarises publicly available headlines and lead text. No full article text is reproduced.</p>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var btn = document.getElementById('dm-toggle');
+
+  function applyDark(on) {
+    document.body.classList.toggle('dark-mode', on);
+    btn.textContent = on ? '☀️' : '🌙';
+  }
+
+  // Restore persisted preference
+  try { applyDark(localStorage.getItem('dm') === '1'); } catch (e) {}
+
+  btn.addEventListener('click', function () {
+    var on = document.body.classList.toggle('dark-mode');
+    btn.textContent = on ? '☀️' : '🌙';
+    try { localStorage.setItem('dm', on ? '1' : '0'); } catch (e) {}
+  });
+
+  // Lazy-reveal article cards via IntersectionObserver
+  if ('IntersectionObserver' in window) {
+    var cardIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          cardIO.unobserve(e.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      cardIO.observe(c);
+    });
+  } else {
+    // Fallback: reveal all cards immediately for older browsers
+    document.querySelectorAll('.article-card').forEach(function (c) {
+      c.classList.add('visible');
+    });
+  }
+
+  // Highlight active sidebar link as user scrolls
+  var sections = document.querySelectorAll('.category-section');
+  var sideLinks = document.querySelectorAll('.sidebar-link');
+  if (sections.length && sideLinks.length && 'IntersectionObserver' in window) {
+    var secIO = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          sideLinks.forEach(function (l) { l.classList.remove('active'); });
+          var active = document.querySelector('.sidebar-link[href="#' + e.target.id + '"]');
+          if (active) active.classList.add('active');
+        }
+      });
+    }, { threshold: 0.25 });
+    sections.forEach(function (s) { secIO.observe(s); });
+  }
+})();
+</script>
+
+</body>
+</html>
